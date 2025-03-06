@@ -18,20 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <header className="bg-blue-600 text-white py-3 px-4 shadow-md">
-          <div className="container mx-auto">
-            <h1 className="text-xl font-bold">Document Anonymizer</h1>
-          </div>
-        </header>
-        <main className="container mx-auto py-6">
+      <body className="bg-slate-900 text-slate-200 min-h-screen">
+        <main className="w-full mx-auto">
           {children}
         </main>
-        <footer className="bg-gray-100 py-4 mt-8 border-t">
-          <div className="container mx-auto text-center text-gray-600 text-sm">
-            &copy; {new Date().getFullYear()} Document Anonymizer - Privacy Tool
-          </div>
-        </footer>
       </body>
     </html>
   );

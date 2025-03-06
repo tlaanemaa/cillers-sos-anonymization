@@ -1,32 +1,120 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss"; /* Do not remove this line */
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 236, 242, 250;
+  --background-rgb: 17, 24, 39;
+  --background: #111827;
+  --foreground: #ecf2fa;
+  --accent-color: #38bdf8;
+  --accent-light: #7dd3fc;
+  --accent-dark: #0284c7;
+  --secondary-color: #f472b6;
+  --secondary-light: #f9a8d4;
+  --secondary-dark: #db2777;
+  --neutral-dark: #1f2937;
+  --neutral-medium: #374151;
+  --neutral-light: #6b7280;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 0, 0, 0;
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2s;
   }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
 }
 
 body {
   background: rgb(var(--background-rgb));
   color: rgb(var(--foreground-rgb));
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(244, 114, 182, 0.05) 0%, transparent 50%);
+}
+
+/* Card styling */
+.card {
+  @apply bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/30;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.03),
+    transparent
+  );
+  transform: skewX(-15deg);
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+
+.card:hover::before {
+  left: 150%;
+  transition: all 0.7s ease;
+}
+
+/* Button styling */
+.btn-primary {
+  @apply bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 
+    text-white py-3 px-6 rounded-xl transition-all duration-300 shadow-md 
+    flex items-center justify-center font-medium;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-secondary {
+  @apply bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 
+    text-white py-3 px-6 rounded-xl transition-all duration-300 shadow-md 
+    flex items-center justify-center font-medium;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-success {
+  @apply bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 
+    text-white py-3 px-6 rounded-xl transition-all duration-300 shadow-md 
+    flex items-center justify-center font-medium;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Grid pattern background */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { PIIDetection } from '@/app/store/documentStore';
 import HighlightedText from './HighlightedText';
 import RedactedText from './RedactedText';
+import { BoltIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 interface TextHighlighterProps {
   text: string;
@@ -46,17 +47,41 @@ export default function TextHighlighter({
     const container = containerRef.current;
     if (!container) return;
     
-    // Get the start and end offsets in the text
+    // Get the selected text
+    const selectedText = range.toString();
+    if (!selectedText || selectedText.trim() === '') return;
+    
+    // Find the position in the original text
     try {
-      const preSelectionRange = range.cloneRange();
-      preSelectionRange.selectNodeContents(container);
-      preSelectionRange.setEnd(range.startContainer, range.startOffset);
-      const startOffset = preSelectionRange.toString().length;
+      // Get the text content of the container
+      const containerText = container.textContent || '';
       
-      const endOffset = startOffset + range.toString().length;
+      // Get the text before the selection
+      const textBeforeSelection = window.getSelection()?.anchorNode?.textContent?.substring(0, window.getSelection()?.anchorOffset || 0) || '';
       
-      if (startOffset !== endOffset) {
-        console.log('Selection made:', { startOffset, endOffset });
+      // Find all occurrences of the selected text in the original text
+      const allMatches = [...containerText.matchAll(new RegExp(selectedText, 'g'))];
+      
+      if (allMatches.length > 0) {
+        // Use the first match as a fallback
+        let startOffset = allMatches[0].index;
+        
+        // Try to find the closest match to where the user selected
+        const precedingText = containerText.substring(0, containerText.indexOf(textBeforeSelection) + textBeforeSelection.length);
+        const closestMatch = allMatches.reduce((closest, match) => {
+          const distance = Math.abs(match.index - precedingText.length);
+          return distance < Math.abs(closest.index - precedingText.length) ? match : closest;
+        }, allMatches[0]);
+        
+        startOffset = closestMatch.index;
+        const endOffset = startOffset + selectedText.length;
+        
+        console.log('Selection made:', { 
+          startOffset, 
+          endOffset,
+          selectedText
+        });
+        
         setSelection({ start: startOffset, end: endOffset });
       }
     } catch (error) {
@@ -164,7 +189,7 @@ export default function TextHighlighter({
     <div className="relative">
       <div
         ref={containerRef}
-        className="whitespace-pre-wrap font-mono text-sm p-4 bg-gray-50 dark:bg-gray-800 rounded min-h-[200px] max-h-[500px] overflow-auto"
+        className="whitespace-pre-wrap font-mono text-sm p-4 min-h-[300px] max-h-[600px] overflow-auto text-slate-200"
         onMouseUp={handleMouseUp}
       >
         {renderedText}
@@ -172,20 +197,25 @@ export default function TextHighlighter({
       
       {/* Selection confirmation dialog */}
       {selection && (
-        <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-700 p-4 rounded-lg shadow-lg border border-gray-300 dark:border-gray-600 z-10">
-          <p className="mb-2 dark:text-white">Add custom highlight?</p>
-          <div className="flex gap-2">
+        <div className="absolute bottom-4 right-4 bg-gray-800/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-700/30 z-50">
+          <p className="mb-3 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500 text-sm font-medium flex items-center">
+            <BoltIcon className="w-4 h-4 mr-3 text-sky-400" />
+            Add custom highlight?
+          </p>
+          <div className="flex gap-3">
             <button
               onClick={confirmAddHighlight}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm"
+              className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-center"
             >
-              Add
+              <PlusIcon className="w-4 h-4 mr-2 hover:scale-110 transition-transform" />
+              <span>Add</span>
             </button>
             <button
               onClick={cancelAddHighlight}
-              className="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white px-3 py-1 rounded-md text-sm"
+              className="bg-gray-700 hover:bg-gray-600 text-slate-200 px-4 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-center"
             >
-              Cancel
+              <XMarkIcon className="w-4 h-4 mr-2 hover:scale-110 transition-transform" />
+              <span>Cancel</span>
             </button>
           </div>
         </div>
