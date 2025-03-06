@@ -1,8 +1,13 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
   --background: #ffffff;
   --foreground: #171717;
+  --highlight-color: rgba(255, 235, 59, 0.5);
 }
 
 @theme inline {
@@ -14,13 +19,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 0, 0, 0;
     --background: #0a0a0a;
     --foreground: #ededed;
+    --highlight-color: rgba(255, 235, 59, 0.6);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--foreground-rgb));
   font-family: Arial, Helvetica, sans-serif;
 }
