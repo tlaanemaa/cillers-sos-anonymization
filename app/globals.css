@@ -7,7 +7,6 @@
   --background-rgb: 255, 255, 255;
   --background: #ffffff;
   --foreground: #171717;
-  --highlight-color: rgba(255, 235, 59, 0.5);
 }
 
 @theme inline {
@@ -23,7 +22,6 @@
     --background-rgb: 0, 0, 0;
     --background: #0a0a0a;
     --foreground: #ededed;
-    --highlight-color: rgba(255, 235, 59, 0.6);
   }
 }
 

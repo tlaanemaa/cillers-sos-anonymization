@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDocumentStore } from '@/app/store/documentStore';
 import { detectPII, anonymizeText } from '@/app/lib/anonymizer';
 
@@ -13,28 +13,40 @@ export default function ActionControls() {
   
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Debug log
+  useEffect(() => {
+    console.log('ActionControls state:', { 
+      hasText: !!originalText, 
+      detectionsCount: detections.length, 
+      isAnonymized 
+    });
+  }, [originalText, detections, isAnonymized]);
+
   if (!originalText) return null;
   
   const handleDetectPII = () => {
+    console.log('Detecting PII...');
     setIsProcessing(true);
     
     // Use setTimeout to avoid blocking the UI
     setTimeout(() => {
       const foundDetections = detectPII(originalText);
+      console.log('Found detections:', foundDetections);
       setDetections(foundDetections);
       setIsProcessing(false);
     }, 10);
   };
   
   const handleAnonymize = () => {
+    console.log('Anonymizing text...');
     setIsProcessing(true);
     
-    // Use setTimeout to avoid blocking the UI
+    // Use setTimeout to allow for animation to complete
     setTimeout(() => {
       const anonymizedText = anonymizeText(originalText, detections);
       setAnonymizedText(anonymizedText);
       setIsProcessing(false);
-    }, 800); // Delay to allow for animation
+    }, 800);
   };
   
   const handleDownload = () => {

@@ -23,6 +23,15 @@ export default function TextHighlighter({
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
   const prevDetectionsRef = useRef<string[]>([]);
   
+  // Log for debugging
+  useEffect(() => {
+    console.log('TextHighlighter rendered with:', { 
+      textLength: text?.length, 
+      detectionsCount: detections?.length,
+      isAnonymized 
+    });
+  }, [text, detections, isAnonymized]);
+  
   // Function to handle user text selection for custom highlighting
   const handleMouseUp = useCallback(() => {
     if (isAnonymized) return;
@@ -47,6 +56,7 @@ export default function TextHighlighter({
       const endOffset = startOffset + range.toString().length;
       
       if (startOffset !== endOffset) {
+        console.log('Selection made:', { startOffset, endOffset });
         setSelection({ start: startOffset, end: endOffset });
       }
     } catch (error) {
@@ -57,6 +67,7 @@ export default function TextHighlighter({
   // Function to confirm adding a custom highlight
   const confirmAddHighlight = useCallback(() => {
     if (selection) {
+      console.log('Adding highlight:', selection);
       onAddHighlight(selection.start, selection.end);
       setSelection(null);
       window.getSelection()?.removeAllRanges();
@@ -117,14 +128,10 @@ export default function TextHighlighter({
           );
         } else {
           // If not anonymized, show highlighted text
-          // Check if this is a new detection
-          const isNewDetection = !prevDetectionIds.includes(detection.id);
-          
           segments.push(
             <HighlightedText
               key={`highlight-${detection.id}`}
               text={detectionText}
-              isNew={isNewDetection}
               onRemove={() => onRemoveHighlight(detection.id)}
             />
           );
@@ -157,7 +164,7 @@ export default function TextHighlighter({
     <div className="relative">
       <div
         ref={containerRef}
-        className="whitespace-pre-wrap font-mono text-sm p-4 bg-gray-50 rounded min-h-[200px] max-h-[500px] overflow-auto"
+        className="whitespace-pre-wrap font-mono text-sm p-4 bg-gray-50 dark:bg-gray-800 rounded min-h-[200px] max-h-[500px] overflow-auto"
         onMouseUp={handleMouseUp}
       >
         {renderedText}
@@ -165,18 +172,18 @@ export default function TextHighlighter({
       
       {/* Selection confirmation dialog */}
       {selection && (
-        <div className="absolute bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-300 z-10">
-          <p className="mb-2">Add custom highlight?</p>
+        <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-700 p-4 rounded-lg shadow-lg border border-gray-300 dark:border-gray-600 z-10">
+          <p className="mb-2 dark:text-white">Add custom highlight?</p>
           <div className="flex gap-2">
             <button
               onClick={confirmAddHighlight}
-              className="bg-green-600 text-white px-3 py-1 rounded-md text-sm"
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm"
             >
               Add
             </button>
             <button
               onClick={cancelAddHighlight}
-              className="bg-gray-300 text-gray-700 px-3 py-1 rounded-md text-sm"
+              className="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white px-3 py-1 rounded-md text-sm"
             >
               Cancel
             </button>
