@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { PIIDetection } from '@/app/store/documentStore';
+import { Redaction } from '@/ai/schemas';
 import HighlightedText from './HighlightedText';
 import RedactedText from './RedactedText';
 import { BoltIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 interface TextHighlighterProps {
   text: string;
-  detections: PIIDetection[];
+  detections: Redaction[];
   isAnonymized: boolean;
   onAddHighlight: (start: number, end: number) => void;
   onRemoveHighlight: (id: string) => void;

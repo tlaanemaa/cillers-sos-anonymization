@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 import { useDocumentStore } from "@/app/store/documentStore";
 import { InformationCircleIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
-import { SmallText } from "../shared/Typography";
 import IconWrapper from "../shared/IconWrapper";
 
 export default function FileUpload() {
@@ -13,48 +12,43 @@ export default function FileUpload() {
   const [isDragging, setIsDragging] = useState(false);
   
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    processFile(file);
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      processFile(file);
+    }
   };
   
-  const processFile = (file: File) => {
+  const processFile = useCallback((file: File) => {
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      setOriginalText(text);
-      
-      // Navigate to editor page
-      router.push("/editor");
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        const text = e.target.result.toString();
+        setOriginalText(text);
+        router.push("/editor");
+      }
     };
-    
     reader.readAsText(file);
-  };
+  }, [router, setOriginalText]);
   
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   }, []);
   
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
   }, []);
   
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
     
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      if (file.type === "text/plain") {
-        processFile(file);
-      } else {
-        alert("Please upload a .txt file");
-      }
+      processFile(file);
     }
-  }, [router, setOriginalText]);
+  }, [processFile]);
 
   return (
     <div className="relative">

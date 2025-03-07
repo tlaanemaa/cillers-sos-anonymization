@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { useDocumentStore } from "@/app/store/documentStore";
 import { detectPII, applyRedactions } from "@/ai";
+import { Redaction } from "@/ai/schemas";
 import { MagnifyingGlassIcon, ArchiveBoxIcon, ArrowDownTrayIcon, PlusCircleIcon, QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import Card from "../shared/Card";
 import Button from "../shared/Button";
-import { SectionTitle } from "../shared/Typography";
-import IconWrapper from "../shared/IconWrapper";
 import RiskSlider from "./RiskSlider";
 
 // Loading spinner component
@@ -107,14 +105,20 @@ export default function ControlPanel() {
     }
 
     // Find the absolute position in the original text
+    const firstChild = documentContainer.firstChild;
+    if (!firstChild) {
+      alert("Cannot determine text position");
+      return;
+    }
+    
     // This is a simplified approach, might need adjustments based on your exact setup
     const textBeforeSelection = document.createRange();
-    textBeforeSelection.setStart(documentContainer.firstChild, 0);
+    textBeforeSelection.setStart(firstChild, 0);
     textBeforeSelection.setEnd(range.startContainer, range.startOffset);
     const startPos = textBeforeSelection.toString().length;
     
     // Add this as a new detection
-    const newDetection = {
+    const newDetection: Redaction = {
       id: `manual-${Date.now()}`,
       type: "MANUAL_PII",
       start: startPos,

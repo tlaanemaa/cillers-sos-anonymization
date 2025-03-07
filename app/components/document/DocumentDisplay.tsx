@@ -1,4 +1,5 @@
 import { useDocumentStore } from '@/app/store/documentStore';
+import { Redaction } from '@/ai/schemas';
 import TextHighlighter from './TextHighlighter';
 import { DocumentTextIcon, ShieldCheckIcon, InformationCircleIcon, ArrowPathIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 
@@ -7,11 +8,13 @@ export default function DocumentDisplay() {
     originalText, 
     anonymizedText, 
     detections, 
-    isAnonymized,
     addDetection,
     removeDetection,
     reset
   } = useDocumentStore();
+
+  // Calculate isAnonymized from anonymizedText
+  const isAnonymized = !!anonymizedText;
 
   if (!originalText) return null;
 
@@ -62,12 +65,15 @@ export default function DocumentDisplay() {
             isAnonymized={isAnonymized}
             onAddHighlight={(start, end) => {
               console.log('Adding custom highlight:', { start, end });
-              addDetection({
-                type: 'custom',
+              const newDetection: Redaction = {
+                id: `manual-${Date.now()}`,
+                type: "MANUAL_PII",
                 start,
                 end,
-                id: `custom-${Date.now()}`
-              });
+                confidence: 1.0,
+                text: originalText.substring(start, end)
+              };
+              addDetection(newDetection);
             }}
             onRemoveHighlight={(id) => {
               console.log('Removing highlight:', id);

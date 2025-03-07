@@ -7,7 +7,7 @@ export const RedactionSchema = z
   .object({
     id: z.string({ description: "unique identifier for the redaction" }),
     type: z.enum(
-      ["name", "address", "phone", "email", "ip", "credit-card", "other"],
+      ["name", "address", "phone", "email", "ip", "credit-card", "other", "MANUAL_PII"],
       {
         description: "type of the redaction",
       }
@@ -24,6 +24,7 @@ export const RedactionSchema = z
       .number({ description: "end index of the redaction" })
       .int()
       .nonnegative(),
+    text: z.string({ description: "the redacted text content" }).optional(),
   })
   .refine((data) => data.end >= data.start, {
     message: "End index must be greater than or equal to start index",

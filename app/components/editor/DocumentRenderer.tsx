@@ -30,7 +30,7 @@ export default function DocumentRenderer() {
     const sortedDetections = [...detections].sort((a, b) => a.start - b.start);
     
     // Build the highlighted text
-    let result = [];
+    const result = [];
     let lastIndex = 0;
     
     for (let i = 0; i < sortedDetections.length; i++) {
@@ -130,7 +130,7 @@ export default function DocumentRenderer() {
     }
     
     return result;
-  }, [originalText, anonymizedText, detections, isAnonymized, isHoveringDetection, removeDetection, isPermanentHover]);
+  }, [originalText, anonymizedText, detections, isAnonymized, isHoveringDetection, removeDetection, isPermanentHover, displayText]);
 
   return (
     <div className="h-full flex flex-col w-full overflow-hidden">

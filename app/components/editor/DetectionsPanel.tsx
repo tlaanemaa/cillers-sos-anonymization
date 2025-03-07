@@ -1,6 +1,7 @@
 "use client";
 
 import { useDocumentStore } from "@/app/store/documentStore";
+import { Redaction } from "@/ai/schemas";
 import { TrashIcon, ShieldCheckIcon, IdentificationIcon } from "@heroicons/react/24/outline";
 import Card from "../shared/Card";
 import { SectionTitle, SmallText, Text } from "../shared/Typography";
@@ -20,12 +21,12 @@ export default function DetectionsPanel() {
         <IconWrapper className="text-sky-400">
           <IdentificationIcon className="w-5 h-5" />
         </IconWrapper>
-        Detected PII
+        <span className="ml-3">Detected PII</span>
       </SectionTitle>
-
+      
       {!detections.length ? (
         <Text className="text-gray-400 text-sm">
-          No PII detected yet. Click "Detect PII" to scan your document.
+          No PII detected yet. Click &quot;Detect PII&quot; to scan your document.
         </Text>
       ) : (
         <DetectionsList 
@@ -38,7 +39,7 @@ export default function DetectionsPanel() {
 }
 
 interface DetectionsListProps {
-  detections: any[];
+  detections: Redaction[];
   onRemove: (id: string) => void;
 }
 
