@@ -122,7 +122,6 @@ export default function TextHighlighter({
       
       // Get previous detection IDs for comparison
       const currentDetectionIds = detections.map(d => d.id);
-      const prevDetectionIds = prevDetectionsRef.current;
       
       sortedDetections.forEach((detection) => {
         // Validate detection boundaries
