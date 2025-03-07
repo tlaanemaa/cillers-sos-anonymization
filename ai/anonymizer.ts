@@ -30,11 +30,11 @@ export async function detectPII(
  * @param redactionChar - Character(s) to use for redaction
  * @returns The redacted text with sensitive information replaced
  */
-export function applyRedactions(
+export async function applyRedactions(
   input: string,
   redactions: Redaction[],
   redactionChar: string = "█"
-): string {
+): Promise<string> {
   if (!input || !redactions.length) return input;
 
   // Sort redactions by start position to handle overlapping redactions
