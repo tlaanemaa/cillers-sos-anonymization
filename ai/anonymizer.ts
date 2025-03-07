@@ -1,6 +1,6 @@
 "use server";
 
-import { RedactionArray, RedactionArraySchema } from "./schemas";
+import { Redaction } from "./schemas";
 import { mockDetectPII } from "./mock";
 /**
  * Detects PII in a given input string based on the risk tolerance.
@@ -12,7 +12,7 @@ import { mockDetectPII } from "./mock";
 export async function detectPII(
   input: string,
   risk_tolerance: number
-): Promise<RedactionArray> {
+): Promise<Redaction[]> {
   if (risk_tolerance < 0 || risk_tolerance > 1) {
     throw new Error("Risk tolerance must be between 0 and 1");
   }
@@ -32,14 +32,10 @@ export async function detectPII(
  */
 export function applyRedactions(
   input: string,
-  redactions: RedactionArray,
+  redactions: Redaction[],
   redactionChar: string = "█"
 ): string {
   if (!input || !redactions.length) return input;
-  const parseResult = RedactionArraySchema.safeParse(redactions);
-  if (!parseResult.success) {
-    throw new Error(`Invalid redaction parameters: ${parseResult.error}`);
-  }
 
   // Sort redactions by start position to handle overlapping redactions
   const sortedRedactions = [...redactions].sort((a, b) => a.start - b.start);

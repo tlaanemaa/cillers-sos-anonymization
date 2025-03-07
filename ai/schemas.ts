@@ -5,6 +5,7 @@ import { z } from "zod";
  */
 export const RedactionSchema = z
   .object({
+    id: z.string({ description: "unique identifier for the redaction" }),
     type: z.enum(
       ["name", "address", "phone", "email", "ip", "credit-card", "other"],
       {
@@ -30,8 +31,3 @@ export const RedactionSchema = z
   });
 
 export type Redaction = z.infer<typeof RedactionSchema>;
-
-export const RedactionArraySchema = z.array(RedactionSchema, {
-  description: "array of redactions",
-});
-export type RedactionArray = z.infer<typeof RedactionArraySchema>;

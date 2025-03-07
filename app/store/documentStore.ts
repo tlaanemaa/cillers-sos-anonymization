@@ -1,66 +1,66 @@
-import { create } from 'zustand';
-
-export interface PIIDetection {
-  type: string;
-  start: number;
-  end: number;
-  id: string;
-}
+import { create } from "zustand";
+import { Redaction } from "@/ai/schemas";
 
 interface DocumentState {
+  // UI Controls
+  riskTolerance: number;
+  setRiskTolerance: (value: number) => void;
+
   // Document state
   originalText: string;
-  anonymizedText: string;
-  
-  // Detection state
-  detections: PIIDetection[];
-  
-  // UI state
-  isAnonymized: boolean;
-  
-  // Actions
   setOriginalText: (text: string) => void;
-  setDetections: (detections: PIIDetection[]) => void;
+  anonymizedText: string;
   setAnonymizedText: (text: string) => void;
-  addDetection: (detection: PIIDetection) => void;
+
+  // Detection state
+  detections: Redaction[];
+  setDetections: (detections: Redaction[]) => void;
+  addDetection: (detection: Redaction) => void;
   removeDetection: (id: string) => void;
+
+  // Actions
   reset: () => void;
 }
 
 export const useDocumentStore = create<DocumentState>((set) => ({
-  // Initial state
-  originalText: '',
-  anonymizedText: '',
+  // UI Controls
+  riskTolerance: 0.5,
+  setRiskTolerance: (value: number) => set({ riskTolerance: value }),
+
+  // Document state
+  originalText: "",
+  setOriginalText: (text: string) =>
+    set({
+      originalText: text,
+      detections: [],
+      anonymizedText: "",
+    }),
+
+  anonymizedText: "",
+  setAnonymizedText: (text: string) =>
+    set({
+      anonymizedText: text,
+    }),
+
+  // Detection state
   detections: [],
-  isAnonymized: false,
-  
+  setDetections: (detections: Redaction[]) => set({ detections }),
+
+  addDetection: (detection: Redaction) =>
+    set((state) => ({
+      detections: [...state.detections, detection],
+    })),
+
+  removeDetection: (id: string) =>
+    set((state) => ({
+      detections: state.detections.filter((detection) => detection.id !== id),
+    })),
+
   // Actions
-  setOriginalText: (text: string) => set({
-    originalText: text,
-    detections: [],
-    anonymizedText: '',
-    isAnonymized: false
-  }),
-  
-  setDetections: (detections: PIIDetection[]) => set({ detections }),
-  
-  setAnonymizedText: (text: string) => set({ 
-    anonymizedText: text,
-    isAnonymized: true
-  }),
-  
-  addDetection: (detection: PIIDetection) => set(state => ({
-    detections: [...state.detections, detection]
-  })),
-  
-  removeDetection: (id: string) => set(state => ({
-    detections: state.detections.filter(detection => detection.id !== id)
-  })),
-  
-  reset: () => set({
-    originalText: '',
-    anonymizedText: '',
-    detections: [],
-    isAnonymized: false
-  })
-})); 
+  reset: () =>
+    set({
+      originalText: "",
+      anonymizedText: "",
+      detections: [],
+    }),
+}));

@@ -1,4 +1,4 @@
-import { RedactionArray } from "./schemas";
+import { Redaction } from "./schemas";
 
 // Sample text for demonstration
 export const SAMPLE_TEXT = `Hello, my name is John Smith and I live at 123 Main St, San Francisco, CA 94105. 
@@ -9,7 +9,7 @@ I was born on January 15, 1980 and my employee ID is EMP-12345.`;
 /**
  * Detects personally identifiable information (PII) in the provided text
  */
-export function mockDetectPII(text: string): RedactionArray {
+export function mockDetectPII(text: string): Redaction[] {
   if (!text) return [];
 
   // Collection of patterns to detect
@@ -30,8 +30,7 @@ export function mockDetectPII(text: string): RedactionArray {
   ] as const;
 
   // Find matches for each pattern
-  const detections: RedactionArray = [];
-  let idCounter = 1;
+  const detections: Redaction[] = [];
 
   patterns.forEach((pattern) => {
     // Create a new regex for each pattern to avoid lastIndex issues
@@ -51,6 +50,7 @@ export function mockDetectPII(text: string): RedactionArray {
       }
 
       detections.push({
+        id: crypto.randomUUID(),
         type: pattern.type,
         confidence: Math.random() * 0.5 + 0.5,
         start: match.index,
