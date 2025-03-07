@@ -24,7 +24,7 @@ export default function Container({
   return (
     <div
       className={twMerge(
-        "w-full mx-auto px-4 sm:px-6 md:px-8",
+        "w-full mx-auto px-2 sm:px-3 md:px-4",
         maxWidthClasses[maxWidth],
         className
       )}

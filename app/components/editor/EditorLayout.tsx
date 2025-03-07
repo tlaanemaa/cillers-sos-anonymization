@@ -3,7 +3,6 @@
 import { useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useDocumentStore } from "@/app/store/documentStore";
-import { PageTitle } from "../shared/Typography";
 
 interface EditorLayoutProps {
   children: ReactNode;
@@ -20,15 +19,11 @@ export default function EditorLayout({ children }: EditorLayoutProps) {
     }
   }, [originalText, router]);
   
-  // Don't render children if no document is loaded
-  if (!originalText) {
-    return null;
-  }
+  // Don't render null if no document, now we handle empty state in the document renderer
   
   return (
-    <>
-      <PageTitle className="mb-8">Document Editor</PageTitle>
+    <div className="w-full flex-1 flex flex-col">
       {children}
-    </>
+    </div>
   );
 } 
