@@ -4,6 +4,7 @@ import { ShieldCheckIcon, EyeSlashIcon, DocumentCheckIcon } from "@heroicons/rea
 import FileUpload from "./components/landing/FileUpload";
 import SampleFile from "./components/landing/SampleFile";
 import Container from "./components/shared/Container";
+import AnimatedParticles from "./components/landing/AnimatedParticles";
 
 export default function Home() {
   return (
@@ -16,33 +17,8 @@ export default function Home() {
       
       {/* Hero Section - All Above the Fold */}
       <section className="relative w-full overflow-hidden flex-1 flex items-center py-8 md:py-12">
-        {/* Animated particles background */}
-        <div className="absolute inset-0 z-0">
-          <div className="relative h-full w-full">
-            {Array.from({ length: 35 }).map((_, index) => (
-              <div 
-                key={index}
-                className="absolute rounded-full"
-                style={{
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 5 + 2}px`,
-                  height: `${Math.random() * 5 + 2}px`,
-                  background: index % 4 === 0 
-                    ? 'rgba(56, 189, 248, 0.35)' 
-                    : index % 4 === 1 
-                    ? 'rgba(244, 114, 182, 0.35)' 
-                    : index % 4 === 2
-                    ? 'rgba(99, 102, 241, 0.35)'
-                    : 'rgba(234, 179, 8, 0.35)',
-                  filter: 'blur(1px)',
-                  animation: `float ${Math.random() * 10 + 15}s linear infinite`,
-                  animationDelay: `${Math.random() * 5}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
+        {/* Client-only animated particles background */}
+        <AnimatedParticles />
         
         <Container maxWidth="full" className="relative z-10">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 px-4 md:px-8 items-center max-w-7xl mx-auto">
