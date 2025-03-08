@@ -1,4 +1,5 @@
 import { Redaction } from "./schemas";
+import { v4 as uuidv4 } from "uuid";
 
 // Sample text for demonstration
 export const SAMPLE_TEXT = `Hello, my name is John Smith and I live at 123 Main St, San Francisco, CA 94105. 
@@ -50,7 +51,7 @@ export function mockDetectPII(text: string): Redaction[] {
       }
 
       detections.push({
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         type: pattern.type,
         confidence: Math.random() * 0.5 + 0.5,
         start: match.index,
