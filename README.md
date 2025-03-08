@@ -8,7 +8,7 @@ To get the project running on your machine:
 
 ### Prerequisites
 
-- Node.js (v18 or later)
+- [Node.js](https://nodejs.org/en) (v18 or later)
 - For the AI module with Ollama: Docker or local [Ollama](https://ollama.com/) installation (optional for initial development)
 
 ### Quick Start
@@ -107,3 +107,4 @@ The CLI code is in `cli/index.ts` and leverages the same AI module as the web ap
 - The project uses TypeScript throughout for better type safety
 - The mock AI module (`ai/mock.ts`) lets you develop without setting up Ollama
 - Use the sample files in `/resources` for testing changes
+- Run `npm run build` to test your changes
