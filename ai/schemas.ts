@@ -7,7 +7,16 @@ export const RedactionSchema = z
   .object({
     id: z.string({ description: "unique identifier for the redaction" }),
     type: z.enum(
-      ["name", "address", "phone", "email", "ip", "credit-card", "other", "MANUAL_PII"],
+      [
+        "name",
+        "address",
+        "phone",
+        "email",
+        "ip",
+        "credit-card",
+        "other",
+        "MANUAL_PII",
+      ],
       {
         description: "type of the redaction",
       }

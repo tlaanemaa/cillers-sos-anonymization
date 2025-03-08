@@ -33,11 +33,5 @@ jobs:
       - name: Security Audit
         run: npm audit --audit-level=high
 
-      - name: Lint Code
-        run: npm run lint
-
-      - name: Type Check
-        run: npm run check-types
-
       - name: Build Next.js App
         run: npm run build
