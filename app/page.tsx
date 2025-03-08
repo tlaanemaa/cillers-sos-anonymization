@@ -24,6 +24,19 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 px-4 md:px-8 items-center max-w-7xl mx-auto">
             {/* Left Side - Value Proposition & Features */}
             <div className="order-1 md:order-1">
+              <div className="flex items-center mb-6">
+                <a 
+                  href="/evaluation" 
+                  className="inline-flex items-center text-xs bg-sky-900/30 hover:bg-sky-800/50 text-sky-300 px-3 py-1 rounded-full border border-sky-800/40 transition-colors"
+                >
+                  <span className="mr-1">🧪</span>
+                  <span>Evaluation Dashboard</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
                 <span className="text-white">Stop Leaking </span>
                 <span className="super-gradient animate-gradient font-extrabold">Sensitive Data</span>
