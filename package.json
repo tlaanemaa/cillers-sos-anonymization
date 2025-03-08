@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@langchain/core": "^0.3.42",
+    "@langchain/ollama": "^0.2.0",
+    "@langchain/openai": "^0.4.4",
     "framer-motion": "^12.4.10",
     "next": "15.2.1",
     "react": "^19.0.0",
