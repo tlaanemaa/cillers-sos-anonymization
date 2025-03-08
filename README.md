@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PII Redaction Tool
 
-## Getting Started
+A comprehensive solution for detecting and redacting personally identifiable information (PII) from text data using AI. This guide will help you get started with the codebase.
 
-First, run the development server:
+## 🔧 Technical Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+To get the project running on your machine:
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- For the AI module with Ollama: Docker or local [Ollama](https://ollama.com/) installation (optional for initial development)
+
+### Quick Start
+
+1. Clone and setup:
+
+   ```bash
+   git clone https://github.com/tlaanemaa/cillers-sos-anonymization.git
+   cd cillers-sos-anonymization
+   npm install
+   ```
+
+2. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Open [http://localhost:3000](http://localhost:3000) to view the web application
+
+## 🧪 Sample Data
+
+The `resources/` directory contains data for testing:
+
+- `test-doc.txt`: Text with synthetic PII (names, addresses, phone numbers)
+- `example-data.csv`: CSV dataset with various PII types
+- `Daganteckning1_processed.pdf`: Sample PDF document
+
+## 💻 Codebase Overview
+
+### AI Module
+
+The AI module in the `/ai` directory handles PII detection and redaction:
+
+- `index.ts`: Main exports and API boundary
+- `detect.ts`: PII detection logic
+- `redact.ts`: Text redaction implementation
+- `schemas.ts`: Data structures for PII entities
+- `mock.ts`: Mock implementation for testing
+
+Basic usage:
+
+```typescript
+import { detect, redact } from "./ai";
+
+// Detect PII with adjustable risk tolerance (0-1)
+const detections = await detect(inputText, 0.5);
+
+// Apply redactions
+const redactedText = await redact(inputText, detections);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Using Real AI Instead of Mocks
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Currently, the AI detection uses mock data. To use a real LLM:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install and run Ollama locally ([Ollama documentation](https://ollama.ai/))
+2. Edit `ai/detect.ts`:
 
-## Learn More
+   ```typescript
+   // Change this:
+   // const redactions = await callPiiAgent(input);
+   const redactions = mockDetectPII(input);
 
-To learn more about Next.js, take a look at the following resources:
+   // To this:
+   const redactions = await callPiiAgent(input);
+   // const redactions = mockDetectPII(input);
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Web Application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The Next.js app in the `/app` directory provides the user interface:
 
-## Deploy on Vercel
+- `page.tsx`: Main page with the redaction interface
+- `components/`: UI components used throughout the app
+- `store/`: State management for the application
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The web app lets you upload text, detect PII, adjust sensitivity settings, and view/download redacted content.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### CLI Tool
+
+The command-line interface provides a way to process files directly:
+
+```bash
+# Process a sample file
+npm run cli -- resources/test-doc.txt
+
+# Save redacted output
+npm run cli -- resources/test-doc.txt > redacted_output.txt
+```
+
+The CLI code is in `cli/index.ts` and leverages the same AI module as the web application.
+
+## 💡 Development Tips
+
+- The project uses TypeScript throughout for better type safety
+- The mock AI module (`ai/mock.ts`) lets you develop without setting up Ollama
+- Use the sample files in `/resources` for testing changes
