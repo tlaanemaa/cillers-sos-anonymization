@@ -162,7 +162,10 @@ export default function EvaluationHistoryPanel() {
       <div className="p-3">
         {/* Performance trend chart */}
         <div className="bg-gray-800/30 rounded-lg border border-gray-700/50 p-3">
-          <PerformanceChart data={history} height={180} />
+          <PerformanceChart 
+            data={history} 
+            height={180} 
+          />
         </div>
         
         {/* History table - dynamic max height based on number of items */}
