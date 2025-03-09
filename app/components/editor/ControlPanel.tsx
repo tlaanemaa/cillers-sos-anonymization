@@ -11,6 +11,7 @@ import {
   PlusCircleIcon,
   QuestionMarkCircleIcon,
   XMarkIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import Button from "../shared/Button";
 import RiskSlider from "./RiskSlider";
@@ -87,6 +88,13 @@ export default function ControlPanel() {
     }
   };
 
+  const handleVerifyClick = () => {
+    const modifiedContentUrl = 'http://localhost/modified-content'; // Replace with your actual URL
+    window.open(modifiedContentUrl, '_blank');
+  };
+
+
+
   const handleDownload = () => {
     if (!anonymizedText) return;
 
@@ -100,6 +108,10 @@ export default function ControlPanel() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  
+
+
 
   // Add a manual PII section
   const handleAddPIISection = () => {
@@ -256,6 +268,7 @@ export default function ControlPanel() {
                 )}
               </Button>
 
+
               <Button
                 onClick={handleAddPIISection}
                 variant="secondary"
@@ -290,6 +303,20 @@ export default function ControlPanel() {
             </div>
           </>
         )}
+
+        {/* Verification button */}
+        {anonymizedText && (
+          <Button
+            onClick={handleVerifyClick}
+            variant="primary"
+            fullWidth
+            className="hover:shadow-md hover:shadow-sky-900/30 transition-all"
+          >
+            <CheckCircleIcon className="w-5 h-5 mr-2" />
+            Verify Anonymized Document
+          </Button>
+        )}
+
 
         <div className="text-gray-400 text-xs text-center pt-4 border-t border-gray-700/30 mt-2">
           <div className="mb-1 text-gray-500">Document Editor v1.0</div>
