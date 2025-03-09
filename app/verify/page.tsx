@@ -18,35 +18,60 @@ export default function VerifyPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Retrieve the anonymized text from sessionStorage
-    const storedAnonymizedText = sessionStorage.getItem("anonymizedText");
-    const storedOriginalText = sessionStorage.getItem("originalText");
+    const checkDocuments = async () => {
+      const storedAnonymizedText = sessionStorage.getItem("anonymizedText");
+      const storedOriginalText = sessionStorage.getItem("originalText");
+      
+      if (!storedAnonymizedText) {
+        alert("No anonymized document found to verify. Redirecting to editor...");
+        setTimeout(() => {
+          router.push("/editor");
+        }, 1000);
+        return;
+      }
+      
+      setAnonymizedText(storedAnonymizedText);
+      
+      // Use stored original text if available
+      const textToUse = storedOriginalText || originalText;
+      
+      // Await the async verification
+      const issues = await performVerificationChecks(storedAnonymizedText, textToUse);
+      setVerification({
+        complete: issues.length === 0,
+        issues: issues,
+      });
+      
+      setLoading(false);
+    };
     
-    if (!storedAnonymizedText) {
-      // If no text found, redirect back to editor
-      alert("No anonymized document found to verify. Redirecting to editor...");
-      setTimeout(() => {
-        router.push("/editor");
-      }, 1000);
-      return;
-    }
-    
-    setAnonymizedText(storedAnonymizedText);
-    setLoading(false);
-
-    const textToUse = storedOriginalText || originalText;
-    
-    // Perform automatic verification checks
-    const issues = performVerificationChecks(storedAnonymizedText, originalText);
-    setVerification({
-      complete: issues.length === 0,
-      issues: issues,
-    });
+    checkDocuments();
   }, [router, originalText]);
+
+  // Add this function to your component
+  const checkForBirthdayWithAI = async (text: string, prompt?: string): Promise<boolean> => {
+    const defaultPrompt = `Analyze the following text and determine if it contains any birth dates or age information. Only respond with "true" if you detect birth dates or age information, otherwise respond with "false".`;
+    
+    try {
+      const response = await fetch('/api/verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text, prompt: prompt || defaultPrompt }),
+      });
+      
+      const data = await response.json();
+      return data.containsBirthday;
+    } catch (error) {
+      console.error('Error checking with Gemini:', error);
+      return false;
+    }
+  };
 
 
   // Verification logic
-  const performVerificationChecks = (anonymizedText: string, originalText: string): string[] => {
+  const performVerificationChecks = async (anonymizedText: string, originalText: string): Promise<string[]> => {
     const issues: string[] = [];
     
     // Check for common PII patterns that might have been missed
@@ -61,6 +86,11 @@ export default function VerifyPage() {
     if (/\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b/.test(anonymizedText)) {
       issues.push("Possible SSN detected in anonymized text");
     }
+    // AI-powered birthday check
+  const containsBirthday = await checkForBirthdayWithAI(anonymizedText);
+  if (containsBirthday) {
+    issues.push("Gemini detected a possible birth date in anonymized text");
+  }
     
     // Add more checks as needed
     
