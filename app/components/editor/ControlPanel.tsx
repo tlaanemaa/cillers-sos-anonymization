@@ -89,8 +89,25 @@ export default function ControlPanel() {
   };
 
   const handleVerifyClick = () => {
-    const modifiedContentUrl = 'http://localhost/modified-content'; // Replace with your actual URL
-    window.open(modifiedContentUrl, '_blank');
+    if (!anonymizedText) {
+      alert('Please anonymize the document first before verifying');
+      return;
+    }
+    
+    // Create a base URL that works in different environments
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    const modifiedContentUrl = `${baseUrl}/verify`;
+    
+    // Store the anonymized text in sessionStorage so the verification page can access it
+    sessionStorage.setItem('anonymizedText', anonymizedText);
+    
+    // Open the new tab
+    const newTab = window.open(modifiedContentUrl, '_blank');
+  
+    // Check if the new tab was successfully opened
+    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+      alert('Failed to open the verification page. Please check your popup blocker settings.');
+    }
   };
 
 
