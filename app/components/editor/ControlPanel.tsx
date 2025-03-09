@@ -100,6 +100,7 @@ export default function ControlPanel() {
     
     // Store the anonymized text in sessionStorage so the verification page can access it
     sessionStorage.setItem('anonymizedText', anonymizedText);
+    sessionStorage.setItem('originalText', originalText); 
     
     // Open the new tab
     const newTab = window.open(modifiedContentUrl, '_blank');
