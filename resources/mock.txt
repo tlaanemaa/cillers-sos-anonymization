@@ -1,0 +1,4 @@
+Hello, my name is <|John Smith|> and I live at 123 Main St, San Francisco, CA 94105. 
+You can reach me at john.smith@example.com or call me at (555) 123-4567.
+My social security number is <|123-45-6789|> and my credit card number is <|4111-1111-1111-1111|>.
+I was born on January 15, 1980 and my employee ID is EMP-12345.
