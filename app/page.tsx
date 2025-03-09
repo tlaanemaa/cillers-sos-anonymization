@@ -30,7 +30,7 @@ export default function Home() {
               </h1>
               
               <p className="text-lg md:text-xl text-gray-200 mb-6 max-w-lg">
-                Our AI anonymizer <span className="font-semibold text-sky-300">instantly removes personal information</span> from your documents with just one click.
+                Our AI-powered solution <span className="font-semibold text-sky-300">instantly removes personal information</span> from your documents with just one click.
               </p>
               
               {/* Trust Badges */}
@@ -134,8 +134,23 @@ export default function Home() {
       </section>
       
       {/* Minimal footer */}
-      <footer className="py-4 border-t border-gray-800/30 text-center text-sm text-gray-500 mt-auto">
-        © 2023 Document Anonymizer · Privacy Policy · Terms of Service
+      <footer className="py-6 border-t border-slate-800/30 bg-slate-900/30 backdrop-blur-sm text-center text-sm text-slate-500 mt-auto">
+        <Container maxWidth="7xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center">
+              <div className="mr-3">
+                <span className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">Redact AI</span>
+              </div>
+              <span className="text-xs">© {new Date().getFullYear()} All rights reserved</span>
+            </div>
+            
+            <div className="flex space-x-6">
+              <a href="#" className="text-slate-400 hover:text-slate-300 transition-colors">Privacy Policy</a>
+              <a href="#" className="text-slate-400 hover:text-slate-300 transition-colors">Terms of Service</a>
+              <a href="#" className="text-slate-400 hover:text-slate-300 transition-colors">Contact</a>
+            </div>
+          </div>
+        </Container>
       </footer>
     </main>
   );

@@ -18,14 +18,15 @@ export default function EditorPage() {
       </div>
       
       {/* Header with navigation */}
-      <header className="relative z-10 w-full border-b border-gray-800/40 backdrop-blur-sm bg-gray-900/20">
+      <header className="relative z-10 w-full border-b border-slate-800/40 backdrop-blur-sm bg-slate-900/30">
         <Container maxWidth="full">
           <div className="flex items-center py-3 px-2 md:px-4">
-            <Link href="/" className="flex items-center text-gray-400 hover:text-gray-200 transition-colors text-sm">
+            <Link href="/" className="flex items-center text-slate-300 hover:text-white transition-colors text-sm">
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
               Back to Home
             </Link>
-            <div className="ml-auto text-sm text-gray-400">Document Anonymizer</div>
+            
+            {/* We can leave the right side empty for a cleaner look */}
           </div>
         </Container>
       </header>
@@ -40,23 +41,30 @@ export default function EditorPage() {
       </Container>
       
       {/* Footer with keyboard shortcuts */}
-      <footer className="relative z-10 border-t border-gray-800/30 py-2 backdrop-blur-sm bg-gray-900/20">
+      <footer className="relative z-10 border-t border-slate-800/30 py-3 backdrop-blur-sm bg-slate-900/30">
         <Container maxWidth="full">
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-xs text-gray-500">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-xs">
             <div className="flex items-center">
-              <kbd className="px-1.5 py-0.5 bg-gray-800 rounded border border-gray-700 text-gray-400 mx-1">Tab</kbd>
-              <span>Navigate controls</span>
+              <kbd className="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300 mx-1 shadow-sm">Tab</kbd>
+              <span className="text-slate-400">Navigate controls</span>
             </div>
             <div className="flex items-center">
-              <kbd className="px-1.5 py-0.5 bg-gray-800 rounded border border-gray-700 text-gray-400 mx-1">Ctrl</kbd>
-              <span>+</span>
-              <kbd className="px-1.5 py-0.5 bg-gray-800 rounded border border-gray-700 text-gray-400 mx-1">S</kbd>
-              <span>Save document</span>
+              <kbd className="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300 mx-1 shadow-sm">Ctrl</kbd>
+              <span className="text-slate-400">+</span>
+              <kbd className="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300 mx-1 shadow-sm">S</kbd>
+              <span className="text-slate-400">Save document</span>
             </div>
             <div className="flex items-center">
-              <kbd className="px-1.5 py-0.5 bg-gray-800 rounded border border-gray-700 text-gray-400 mx-1">Esc</kbd>
-              <span>Cancel selection</span>
+              <kbd className="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300 mx-1 shadow-sm">Esc</kbd>
+              <span className="text-slate-400">Cancel selection</span>
             </div>
+          </div>
+          
+          <div className="mt-4 pt-3 border-t border-slate-800/30 flex justify-center">
+            <span className="text-xs text-slate-500">
+              <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">Redact AI</span>
+              {" "}· Secure document processing
+            </span>
           </div>
         </Container>
       </footer>

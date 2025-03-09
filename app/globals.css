@@ -1,19 +1,54 @@
 @import "tailwindcss"; /* Do not remove this line */
 
 :root {
+  /* Color system */
   --foreground-rgb: 236, 242, 250;
-  --background-rgb: 17, 24, 39;
-  --background: #111827;
+  --background-rgb: 15, 23, 42;
+  --background: #0f172a;
   --foreground: #ecf2fa;
-  --accent-color: #38bdf8;
-  --accent-light: #7dd3fc;
-  --accent-dark: #0284c7;
-  --secondary-color: #f472b6;
-  --secondary-light: #f9a8d4;
-  --secondary-dark: #db2777;
-  --neutral-dark: #1f2937;
-  --neutral-medium: #374151;
-  --neutral-light: #6b7280;
+
+  /* Primary brand colors */
+  --primary-light: #7dd3fc;
+  --primary: #0ea5e9;
+  --primary-dark: #0284c7;
+  
+  /* Secondary brand colors */
+  --secondary-light: #a5b4fc;
+  --secondary: #6366f1;
+  --secondary-dark: #4f46e5;
+  
+  /* Accent colors */
+  --accent-light: #f9a8d4;
+  --accent: #ec4899;
+  --accent-dark: #db2777;
+  
+  /* Success colors */
+  --success-light: #86efac;
+  --success: #10b981;
+  --success-dark: #059669;
+  
+  /* Warning colors */
+  --warning-light: #fcd34d;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  
+  /* Danger colors */
+  --danger-light: #fda4af;
+  --danger: #f43f5e;
+  --danger-dark: #e11d48;
+  
+  /* Neutral colors */
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  --neutral-950: #020617;
 }
 
 @layer utilities {
@@ -109,17 +144,17 @@
 }
 
 body {
-  background: rgb(var(--background-rgb));
-  color: rgb(var(--foreground-rgb));
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(244, 114, 182, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
 }
 
 /* Card styling */
 .card {
-  @apply bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/30;
+  @apply bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-slate-700/30;
   position: relative;
   overflow: hidden;
 }
@@ -158,7 +193,7 @@ body {
 }
 
 .btn-secondary {
-  @apply bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 
+  @apply bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 
     text-white py-3 px-6 rounded-xl transition-all duration-300 shadow-md 
     flex items-center justify-center font-medium;
   position: relative;
@@ -168,6 +203,15 @@ body {
 
 .btn-success {
   @apply bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 
+    text-white py-3 px-6 rounded-xl transition-all duration-300 shadow-md 
+    flex items-center justify-center font-medium;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-danger {
+  @apply bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 
     text-white py-3 px-6 rounded-xl transition-all duration-300 shadow-md 
     flex items-center justify-center font-medium;
   position: relative;
@@ -195,10 +239,28 @@ body {
   animation: gradient-shift 5s ease infinite;
 }
 
+.gradient-text-secondary {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-violet-600;
+  background-size: 200% auto;
+  animation: gradient-shift 5s ease infinite;
+}
+
+.gradient-text-accent {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600;
+  background-size: 200% auto;
+  animation: gradient-shift 5s ease infinite;
+}
+
 .super-gradient {
-  background: linear-gradient(to right, #38bdf8, #818cf8, #f472b6, #fb923c);
+  background: linear-gradient(to right, #0ea5e9, #6366f1, #ec4899, #f59e0b);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   background-size: 300% 100%;
+  animation: gradient-shift 5s ease infinite;
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-sky-500/70 focus:ring-offset-2 focus:ring-offset-slate-900;
 }
