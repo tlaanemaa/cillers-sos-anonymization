@@ -10,6 +10,7 @@
     "cli": "ts-node cli/index.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "@heroicons/react": "^2.2.0",
     "@langchain/core": "^0.3.42",
     "@langchain/ollama": "^0.2.0",
