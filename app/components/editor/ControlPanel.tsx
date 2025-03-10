@@ -96,7 +96,7 @@ export default function ControlPanel() {
     
     // Create a base URL that works in different environments
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-    const modifiedContentUrl = `${baseUrl}/verify`;
+    const modifiedContentUrl = `${baseUrl}/verification`;
     
     // Store the anonymized text in sessionStorage so the verification page can access it
     sessionStorage.setItem('anonymizedText', anonymizedText);
