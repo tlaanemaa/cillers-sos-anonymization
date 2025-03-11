@@ -11,6 +11,8 @@ export { SAMPLE_TEXT } from "./mock";
  *
  * @param input - The input string to detect PII in.
  * @param risk_tolerance - The risk tolerance for the detection (0-1).
+ *                       - Low risk tolerance (0) → "Conservative" → detects more potential PII
+ *                       - High risk tolerance (1) → "Aggressive" → focuses on high-confidence PII only
  * @returns An array of redactions representing the detected PII.
  */
 export async function detect(

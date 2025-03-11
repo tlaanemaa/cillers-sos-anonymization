@@ -13,6 +13,8 @@ export async function detectPII(
   // const redactions = await callPiiAgent(input);
   const redactions = mockDetectPII(input);
   return redactions.filter(
+    // Low risk tolerance (0) → "Conservative" → detects more potential PII (low confidence threshold)
+    // High risk tolerance (1) → "Aggressive" → focuses on high-confidence PII only (high confidence threshold)
     (redaction) => redaction.confidence >= bounded_risk_tolerance
   );
 }
