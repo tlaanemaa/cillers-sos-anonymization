@@ -12,6 +12,8 @@ import {
   QuestionMarkCircleIcon,
   XMarkIcon,
   CheckCircleIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import Button from "../shared/Button";
 import LoadingSpinner from "../shared/LoadingSpinner";
@@ -34,6 +36,7 @@ export default function ControlPanel() {
   const [showTips, setShowTips] = useState(false);
   const [selectedPiiTypes, setSelectedPiiTypes] = useState<PiiType[]>([]);
   const [freeTextInput, setFreeTextInput] = useState("");
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
   const handleDetectPII = async () => {
     // Check if there are any manual detections and confirm if needed
@@ -208,6 +211,7 @@ export default function ControlPanel() {
             <li>Select text directly in the document to mark as PII</li>
             <li>Click detected PII items to see details</li>
             <li>Press Esc to cancel a selection</li>
+            <li>Use Advanced Options to customize PII types and add context</li>
           </ul>
         </div>
       )}
@@ -234,21 +238,46 @@ export default function ControlPanel() {
           </>
         ) : (
           <>
-            {/* Risk Tolerance Panel */}
+            {/* Risk Tolerance Panel - Always visible */}
             <RiskTolerancePanel
               riskTolerance={riskTolerance}
               onChange={setRiskTolerance}
             />
 
-            {/* PII Types Selection */}
-            <PiiTypeSelector
-              selectedTypes={selectedPiiTypes}
-              onChange={setSelectedPiiTypes}
-            />
+            {/* Advanced Options Toggle - now more compact */}
+            <div className="flex justify-end mb-3">
+              <button
+                onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                className="text-xs text-gray-400 hover:text-gray-300 flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                <span>Advanced options</span>
+                {showAdvancedOptions ? (
+                  <ChevronDownIcon className="w-3 h-3" />
+                ) : (
+                  <ChevronRightIcon className="w-3 h-3" />
+                )}
+              </button>
+            </div>
 
-            {/* Free Text Input */}
-            <FreeTextInput value={freeTextInput} onChange={setFreeTextInput} />
+            {/* Advanced Options Panel */}
+            <div 
+              className={`space-y-4 overflow-hidden transition-all duration-300 ease-in-out ${
+                showAdvancedOptions 
+                  ? "max-h-[1000px] opacity-100 mb-4" 
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              {/* PII Types Selection */}
+              <PiiTypeSelector
+                selectedTypes={selectedPiiTypes}
+                onChange={setSelectedPiiTypes}
+              />
 
+              {/* Free Text Input */}
+              <FreeTextInput value={freeTextInput} onChange={setFreeTextInput} />
+            </div>
+
+            {/* Action Buttons - Always visible */}
             <div className="space-y-3">
               <Button
                 onClick={handleDetectPII}
