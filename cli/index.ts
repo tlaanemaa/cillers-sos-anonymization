@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { detect, redact } from "../ai";
+import { detect, redact } from "@/ai";
 
 const RISK_TOLERANCE = 0.5;
 

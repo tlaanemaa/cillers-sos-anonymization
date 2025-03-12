@@ -1,26 +1,29 @@
 import { z } from "zod";
 
+// PII types enum values - can be used by UI components
+export const PII_TYPES = [
+  "name",
+  "address",
+  "phone",
+  "email",
+  "ip",
+  "credit-card",
+  "other",
+  "MANUAL_PII",
+] as const;
+
+// Type for PII types
+export type PiiType = (typeof PII_TYPES)[number];
+
 /**
  * Zod schema for the Redaction interface
  */
 export const RedactionSchema = z
   .object({
     id: z.string({ description: "unique identifier for the redaction" }),
-    type: z.enum(
-      [
-        "name",
-        "address",
-        "phone",
-        "email",
-        "ip",
-        "credit-card",
-        "other",
-        "MANUAL_PII",
-      ],
-      {
-        description: "type of the redaction",
-      }
-    ),
+    type: z.enum(PII_TYPES, {
+      description: "type of the redaction",
+    }),
     confidence: z
       .number({ description: "confidence of the redaction" })
       .min(0)

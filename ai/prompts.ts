@@ -10,6 +10,10 @@ Detect personally identifiable information (PII) in the following text:
 {TEXT}
 </text>
 
+PII types to detect: {PII_TYPES}
+
+Additional context: {FREE_TEXT}
+
 Please return the list of PII detected in the text. Return at least 2 items in the list!
 `;
 

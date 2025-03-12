@@ -9,6 +9,9 @@ I was born on January 15, 1980 and my employee ID is EMP-12345.`;
 
 /**
  * Detects personally identifiable information (PII) in the provided text
+ *
+ * @param text - The text to analyze for PII
+ * @returns Array of detected PII elements
  */
 export function mockDetectPII(text: string): Redaction[] {
   if (!text) return [];
