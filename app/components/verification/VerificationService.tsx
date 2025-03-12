@@ -11,9 +11,8 @@
           },
           body: JSON.stringify({ text, prompt }),
         });
-        
         const data = await response.json();
-        return data.containsIssue || data.containsBirthday || false;
+        return data.final_response;
       } catch (error) {
         console.error('Error checking with AI:', error);
         return false;
