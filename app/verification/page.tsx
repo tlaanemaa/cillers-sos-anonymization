@@ -21,7 +21,6 @@ export default function VerifyPage() {
   useEffect(() => {
     const loadDocuments = async () => {
       const storedAnonymizedText = sessionStorage.getItem("anonymizedText");
-      const storedOriginalText = sessionStorage.getItem("originalText");
       
       if (!storedAnonymizedText) {
         alert("No anonymized document found to verify. Redirecting to editor...");
