@@ -11,6 +11,7 @@ import {
   PlusCircleIcon,
   QuestionMarkCircleIcon,
   XMarkIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import Button from "../shared/Button";
 import RiskSlider from "./RiskSlider";
@@ -87,6 +88,31 @@ export default function ControlPanel() {
     }
   };
 
+  const handleVerifyClick = () => {
+    if (!anonymizedText) {
+      alert('Please anonymize the document first before verifying');
+      return;
+    }
+    
+    // Create a base URL that works in different environments
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    const modifiedContentUrl = `${baseUrl}/verification`;
+    
+    // Store the anonymized text in sessionStorage so the verification page can access it
+    sessionStorage.setItem('anonymizedText', anonymizedText);
+    sessionStorage.setItem('originalText', originalText); 
+    
+    // Open the new tab
+    const newTab = window.open(modifiedContentUrl, '_blank');
+  
+    // Check if the new tab was successfully opened
+    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+      alert('Failed to open the verification page. Please check your popup blocker settings.');
+    }
+  };
+
+
+
   const handleDownload = () => {
     if (!anonymizedText) return;
 
@@ -100,6 +126,10 @@ export default function ControlPanel() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  
+
+
 
   // Add a manual PII section
   const handleAddPIISection = () => {
@@ -256,6 +286,7 @@ export default function ControlPanel() {
                 )}
               </Button>
 
+
               <Button
                 onClick={handleAddPIISection}
                 variant="secondary"
@@ -290,6 +321,20 @@ export default function ControlPanel() {
             </div>
           </>
         )}
+
+        {/* Verification button */}
+        {anonymizedText && (
+          <Button
+            onClick={handleVerifyClick}
+            variant="primary"
+            fullWidth
+            className="hover:shadow-md hover:shadow-sky-900/30 transition-all"
+          >
+            <CheckCircleIcon className="w-5 h-5 mr-2" />
+            Verify Anonymized Document
+          </Button>
+        )}
+
 
         <div className="text-gray-400 text-xs text-center pt-4 border-t border-gray-700/30 mt-2">
           <div className="mb-1 text-gray-500">Document Editor v1.0</div>
