@@ -13,8 +13,7 @@ export async function POST(request: Request) {
     
     // Craft a prompt for birthday detection
     const fullPrompt = `
-      ${prompt}
-            
+      ${prompt}            
       Text to analyze: "${text}"
     `;
     
@@ -25,9 +24,9 @@ export async function POST(request: Request) {
     const responseText = response.text().trim().toLowerCase();
     
     // Check if the response indicates a birthday was found
-    const containsBirthday = responseText === 'true';
+    const final_response = responseText === 'true';
     
-    return NextResponse.json({ containsBirthday });
+    return NextResponse.json({ final_response });
   } catch (error) {
     console.error('Error processing request:', error);
     return NextResponse.json(
