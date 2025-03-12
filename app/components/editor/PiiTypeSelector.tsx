@@ -1,6 +1,7 @@
 "use client";
 
 import { PII_TYPES, PiiType } from "@/ai/schemas";
+import { CheckIcon } from "@heroicons/react/24/solid";
 
 // Map PII types to user-friendly labels
 const PII_TYPE_LABELS: Record<string, string> = {
@@ -48,16 +49,34 @@ export default function PiiTypeSelector({
       <div className="grid grid-cols-2 gap-2">
         {UI_PII_TYPES.map((type) => (
           <div key={type.id} className="flex items-center">
-            <input
-              type="checkbox"
-              id={`pii-type-${type.id}`}
-              checked={selectedTypes.includes(type.id)}
-              onChange={() => togglePiiType(type.id)}
-              className="mr-2 h-4 w-4 rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-800"
-            />
+            <div 
+              onClick={() => togglePiiType(type.id)}
+              className="relative mr-2 h-4 w-4 flex-shrink-0 cursor-pointer"
+            >
+              {/* Custom checkbox container */}
+              <div className={`
+                h-4 w-4 rounded 
+                ${selectedTypes.includes(type.id) 
+                  ? 'bg-gradient-to-br from-sky-500 to-indigo-500 border-transparent' 
+                  : 'bg-gray-700 border border-gray-600'} 
+              `}>
+                {/* Checkmark icon */}
+                {selectedTypes.includes(type.id) && (
+                  <CheckIcon className="h-4 w-4 text-white p-px" aria-hidden="true" />
+                )}
+              </div>
+              {/* Hidden real checkbox for accessibility */}
+              <input
+                type="checkbox"
+                id={`pii-type-${type.id}`}
+                checked={selectedTypes.includes(type.id)}
+                onChange={() => togglePiiType(type.id)}
+                className="sr-only"
+              />
+            </div>
             <label
               htmlFor={`pii-type-${type.id}`}
-              className="text-sm text-gray-300"
+              className="text-sm text-gray-300 cursor-pointer"
             >
               {type.label}
             </label>
