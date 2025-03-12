@@ -33,7 +33,7 @@
       
       setLoading(true);
       setActiveVerification(type.id);
-      
+      console.log(`Running ${type.title} verification...`);
       try {
         const hasIssue = await VerificationService.checkTextWithAI(anonymizedText, type.prompt);
         
