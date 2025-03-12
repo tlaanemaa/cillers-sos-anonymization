@@ -68,6 +68,20 @@ export default function ControlPanel() {
 
     setIsProcessing(true);
 
+    try {
+      // Call Flask API
+      const response = await fetch("http://localhost:8000/run-script");
+      const data = await response.json(); // Convert response to JSON
+
+      console.log("Flask API Response:", data); // Log output
+
+      // You can update state with API response if needed
+      setDetections(data.output);
+    } catch (error) {
+      console.error("Error calling Flask API:", error);
+    }
+    setIsProcessing(false);
+
     const foundDetections = await detect(originalText, riskTolerance);
     setDetections(foundDetections);
     setIsProcessing(false);
