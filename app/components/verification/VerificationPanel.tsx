@@ -1,8 +1,8 @@
   // components/verification/VerificationPanel.tsx
   import { useState } from "react";
   import VerificationButton from "./VerificationButton";
-  import VerificationService from "./VerificationService";
-  import { VerificationType } from "./VerificationType";
+  import VerificationService from "../../service/VerificationService";
+  import { VerificationType } from "../../service/types";
   import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
   
   type VerificationPanelProps = {
@@ -28,6 +28,23 @@
     
     const verificationTypes = VerificationService.getVerificationTypes();
     
+    const updateVerification = (prev: { complete: boolean; issues: string[] }, type: VerificationType, hasIssue: boolean) => {
+      // Remove any existing issues of this type
+      const filteredIssues = prev.issues.filter(issue => 
+        !issue.includes(type.id) && !issue.includes(type.title)
+      );
+      
+      // Add the issue if it was found
+      const newIssues = hasIssue 
+        ? [...filteredIssues, type.issueText]
+        : filteredIssues;
+        
+      return {
+        complete: newIssues.length === 0,
+        issues: newIssues
+      };
+    };
+
     const runVerification = async (type: VerificationType) => {
       if (loading) return;
       
@@ -38,22 +55,7 @@
         const hasIssue = await VerificationService.checkTextWithAI(anonymizedText, type.prompt);
         
         // Update verification issues
-        setVerification(prev => {
-          // Remove any existing issues of this type
-          const filteredIssues = prev.issues.filter(issue => 
-            !issue.includes(type.id) && !issue.includes(type.title)
-          );
-          
-          // Add the issue if it was found
-          const newIssues = hasIssue 
-            ? [...filteredIssues, type.issueText]
-            : filteredIssues;
-            
-          return {
-            complete: newIssues.length === 0,
-            issues: newIssues
-          };
-        });
+        setVerification(prev => updateVerification(prev, type, hasIssue));
         
         // Mark as checked
         setCheckedTypes(prev => ({
@@ -97,6 +99,7 @@
                 key={type.id}
                 title={type.title}
                 onClick={() => runVerification(type)}
+                isDetected={hasTypeIssue}
                 isLoading={loading && activeVerification === type.id}
                 icon={icon}
                 variant={hasTypeIssue ? "outline" : "primary"}

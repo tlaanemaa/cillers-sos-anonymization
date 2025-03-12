@@ -1,6 +1,6 @@
-  // components/verification/VerificationService.ts
+  // service/VerificationService.ts
 import { verify } from "@/ai/verify"; // Direct import from the ai folder
-import { VerificationType } from "@/app/components/verification/VerificationType";  
+import { VerificationType } from "@/app/service/types";  
 
   export default class VerificationService {
     static async checkTextWithAI(text: string, prompt: string): Promise<boolean> {
@@ -40,7 +40,7 @@ import { VerificationType } from "@/app/components/verification/VerificationType
           id: "religion",
           title: "Religion",
           prompt: "Analyze the following text and determine if it contains any religion information. Only respond with \"true\" if you detect religion related information, otherwise respond with \"false\".",
-          issueText: "Detected religious information in anonymized text"
+          issueText: "Detected religion information in anonymized text"
         },{
           id: "gender",
           title: "Gender",

@@ -1,4 +1,5 @@
 // ai/verify.ts
+"use server"
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize the Google Generative AI with your API key
@@ -17,15 +18,15 @@ export async function verify(text: string, prompt: string): Promise<boolean> {
 
    
     // Generate content
-    // const result = await model.generateContent(fullPrompt);
-    //const response = await result.response;
-    //const responseText = response.text().trim().toLowerCase();
-    //console.log('AI verification response:', responseText);
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const responseText = response.text().trim().toLowerCase();
+    console.log('AI verification response:', responseText);
     
-    //const found = responseText.includes('true');
+    const found = responseText.includes('true');
     
     // Check if the response indicates something was found
-    return true;
+    return found;
   } catch (error) {
     console.error('Error in AI verification:', error);
     return false;
