@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useDocumentStore } from "@/app/store/documentStore";
 import { detect, redact } from "@/ai";
-import { Redaction } from "@/ai/schemas";
+import { Redaction, PiiType } from "@/ai/schemas";
 import {
   MagnifyingGlassIcon,
   ArchiveBoxIcon,
@@ -14,33 +14,10 @@ import {
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import Button from "../shared/Button";
-import RiskSlider from "./RiskSlider";
-
-// Loading spinner component
-function LoadingSpinner() {
-  return (
-    <svg
-      className="animate-spin h-5 w-5 mr-3 text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      ></path>
-    </svg>
-  );
-}
+import LoadingSpinner from "../shared/LoadingSpinner";
+import PiiTypeSelector from "./PiiTypeSelector";
+import FreeTextInput from "./FreeTextInput";
+import RiskTolerancePanel from "./RiskTolerancePanel";
 
 export default function ControlPanel() {
   const {
@@ -55,6 +32,8 @@ export default function ControlPanel() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [showTips, setShowTips] = useState(false);
+  const [selectedPiiTypes, setSelectedPiiTypes] = useState<PiiType[]>([]);
+  const [freeTextInput, setFreeTextInput] = useState("");
 
   const handleDetectPII = async () => {
     // Check if there are any manual detections and confirm if needed
@@ -69,7 +48,12 @@ export default function ControlPanel() {
 
     setIsProcessing(true);
 
-    const foundDetections = await detect(originalText, riskTolerance);
+    const foundDetections = await detect(
+      originalText,
+      riskTolerance,
+      selectedPiiTypes,
+      freeTextInput
+    );
     setDetections(foundDetections);
     setIsProcessing(false);
   };
@@ -250,20 +234,20 @@ export default function ControlPanel() {
           </>
         ) : (
           <>
-            {/* Always show detection controls */}
-            <div className="bg-gray-800/60 rounded-lg p-4 border border-gray-700/40 mb-4">
-              <div className="mb-2 flex justify-between">
-                <label className="text-sm text-gray-300">Risk Tolerance</label>
-                <span className="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-300">
-                  {Math.round(riskTolerance * 100)}%
-                </span>
-              </div>
-              <RiskSlider value={riskTolerance} onChange={setRiskTolerance} />
-              <div className="mt-2 flex justify-between text-xs text-gray-400">
-                <span>Conservative</span>
-                <span>Aggressive</span>
-              </div>
-            </div>
+            {/* Risk Tolerance Panel */}
+            <RiskTolerancePanel
+              riskTolerance={riskTolerance}
+              onChange={setRiskTolerance}
+            />
+
+            {/* PII Types Selection */}
+            <PiiTypeSelector
+              selectedTypes={selectedPiiTypes}
+              onChange={setSelectedPiiTypes}
+            />
+
+            {/* Free Text Input */}
+            <FreeTextInput value={freeTextInput} onChange={setFreeTextInput} />
 
             <div className="space-y-3">
               <Button
@@ -281,7 +265,7 @@ export default function ControlPanel() {
                 ) : (
                   <>
                     <MagnifyingGlassIcon className="w-5 h-5 mr-2" />
-                    {detections.length > 0 ? "Re-detect PII" : "Detect PII"}
+                    Detect PII
                   </>
                 )}
               </Button>
