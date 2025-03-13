@@ -17,6 +17,7 @@ export async function verify(issue_id: string, text: string, prompt: string): Pr
     - If you don't find the category, set "found" to false and return an empty evidence array
     - Each evidence item should be a direct quote from the original text
     - Include only the most relevant evidence, limited to 3 items maximum
+    - If you don't find evidence, set "found" to false and return an empty evidence array
     - Do not explain your reasoning - respond only with the JSON object
     `;
   try {
@@ -68,6 +69,8 @@ export async function verify(issue_id: string, text: string, prompt: string): Pr
    
 
     console.log('AI found:', found);
+
+    evidence= found? evidence: [];
     console.log('AI evidence:', evidence);
     //console.log('AI verification response:', responseText);
 
