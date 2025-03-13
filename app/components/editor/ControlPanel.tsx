@@ -67,19 +67,27 @@ export default function ControlPanel() {
     }
 
     setIsProcessing(true);
+    const runScript = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/run-script?script=script", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
 
-    try {
-      // Call Flask API
-      const response = await fetch("http://localhost:8000/run-script");
-      const data = await response.json(); // Convert response to JSON
+        const data = await response.json();
+        console.log("Output:", data.output);
+        console.error("Error:", data.error);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
 
-      console.log("Flask API Response:", data); // Log output
+// Call the function
+    runScript();
 
-      // You can update state with API response if needed
-      setDetections(data.output);
-    } catch (error) {
-      console.error("Error calling Flask API:", error);
-    }
+
     setIsProcessing(false);
 
     const foundDetections = await detect(originalText, riskTolerance);
