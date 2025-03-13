@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import IconWrapper from "../shared/IconWrapper";
 import LoadingSpinner from "../shared/LoadingSpinner";
-import { processPDF } from "@/app/actions/pdf";
+import { processPDF } from "@/app/actions/load_and_redact";
 
 export default function FileUpload() {
   const { setOriginalText } = useDocumentStore();
