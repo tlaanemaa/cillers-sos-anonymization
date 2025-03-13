@@ -1,8 +1,8 @@
 // "use server";
 
 import { PiiType, Redaction } from "./schemas";
-// import { callPiiAgent } from "./agent";
-import { mockDetectPII } from "./mock";
+import { callPiiAgent } from "./agent";
+// import { mockDetectPII } from "./mock";
 
 export async function detectPII(
   input: string,
@@ -12,8 +12,8 @@ export async function detectPII(
 ): Promise<Redaction[]> {
   const bounded_risk_tolerance = Math.min(Math.max(risk_tolerance, 0), 1);
 
-  // const redactions = await callPiiAgent(input, piiTypesToDetect, freeTextInput);
-  const redactions = mockDetectPII(input);
+  const redactions = await callPiiAgent(input, piiTypesToDetect, freeTextInput);
+  // const redactions = mockDetectPII(input);
 
   return redactions.filter(
     // Low risk tolerance (0) → "Conservative" → detects more potential PII (low confidence threshold)
