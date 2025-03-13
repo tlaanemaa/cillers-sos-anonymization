@@ -18,7 +18,9 @@ async function runCommand(
   timeoutMs: number = 180000
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const process = spawn(command, args);
+    const process = spawn(command, args, {
+      stdio: ['inherit', 'inherit', 'pipe'] // Inherit stdin/stdout, pipe stderr for error handling
+    });
     let errorOutput = '';
     const timeoutId = setTimeout(() => {
       process.kill(); // Kill the process if it exceeds the timeout
