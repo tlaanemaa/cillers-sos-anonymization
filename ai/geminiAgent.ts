@@ -31,6 +31,7 @@ export async function callPiiAgent(
 ): Promise<Redaction[]> {
     const model = new ChatGoogleGenerativeAI({
         model: "gemini-2.0-flash",
+        temperature: 0.1
     });
 
     // Get the AI response with just the simple list of words to redact
