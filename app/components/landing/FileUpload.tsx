@@ -5,11 +5,13 @@ import { useState, useCallback } from "react";
 import { useDocumentStore } from "@/app/store/documentStore";
 import { InformationCircleIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import IconWrapper from "../shared/IconWrapper";
+import { processPDF } from "@/app/actions/pdf";
 
 export default function FileUpload() {
   const { setOriginalText } = useDocumentStore();
   const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -18,16 +20,33 @@ export default function FileUpload() {
     }
   };
   
-  const processFile = useCallback((file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        const text = e.target.result.toString();
+  const processFile = useCallback(async (file: File) => {
+    try {
+      setIsProcessing(true);
+      
+      if (file.type === 'application/pdf') {
+        // Handle PDF file using server action
+        const text = await processPDF(file);
         setOriginalText(text);
-        router.push("/editor");
+      } else {
+        // Handle text file as before
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            const text = e.target.result.toString();
+            setOriginalText(text);
+          }
+        };
+        reader.readAsText(file);
       }
-    };
-    reader.readAsText(file);
+      
+      router.push("/editor");
+    } catch (error) {
+      console.error('Error processing file:', error);
+      alert('Error processing file. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   }, [router, setOriginalText]);
   
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -71,15 +90,18 @@ export default function FileUpload() {
           </div>
           
           <p className="text-sm text-gray-300">
-            <span className="block font-medium">Drop your text file here</span>
+            <span className="block font-medium">
+              {isProcessing ? "Processing..." : "Drop your file here"}
+            </span>
             <span className="text-xs text-gray-400">or <span className="text-sky-400 cursor-pointer hover:underline">browse files</span></span>
           </p>
           
           <input 
             type="file" 
-            accept=".txt" 
+            accept=".txt,.pdf" 
             onChange={handleDocumentUpload}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            disabled={isProcessing}
           />
         </div>
       </div>
@@ -88,7 +110,7 @@ export default function FileUpload() {
         <IconWrapper>
           <InformationCircleIcon className="w-3 h-3 text-sky-400" />
         </IconWrapper>
-        Only .txt files are supported for now
+        Supported formats: .txt, .pdf
       </div>
     </div>
   );
