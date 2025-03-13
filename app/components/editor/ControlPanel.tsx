@@ -339,10 +339,6 @@ export default function ControlPanel() {
             Verify Anonymized Document
           </Button>
         )}
-
-        <div className="text-gray-400 text-xs text-center pt-4 border-t border-gray-700/30 mt-2">
-          <div className="mb-1 text-gray-500">Document Editor v1.0</div>
-        </div>
       </div>
     </div>
   );
