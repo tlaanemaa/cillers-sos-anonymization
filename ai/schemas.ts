@@ -36,6 +36,7 @@ export const RedactionSchema = z
       .number({ description: "end index of the redaction" })
       .int()
       .nonnegative(),
+    replacement: z.string({ description: "the replacement text for the redaction" }),
     text: z.string({ description: "the redacted text content" }).optional(),
   })
   .refine((data) => data.end >= data.start, {
