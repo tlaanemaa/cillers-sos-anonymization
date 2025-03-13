@@ -57,7 +57,7 @@ if __name__ == "__main__":
     try:
         json_return = main2(sys.argv[1], sys.argv[2])
     #retrieve the 'redactions' values
-        redactions = json_return['redactions']
+        redactions = json_return
         with open(sys.argv[2], 'w') as f:
             f.write(json.dumps(redactions) + '\n')
     except Exception as e:

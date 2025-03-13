@@ -55,7 +55,7 @@ export async function processPDF(file: File): Promise<string> {
             unlink(inputPath),
             unlink(outputPath)
         ]);
-
+        console.log("Parsed output", parsedOutput);
         return parsedOutput.original_text;
     } catch (error) {
         console.error('Error processing PDF:', error);
