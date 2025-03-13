@@ -5,8 +5,10 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import { runCommand } from '../utils/process';
 import { Redaction } from '@/ai';
+import { FileCache } from '../utils/fileCache';
 
 const LOAD_AND_REDACT_STORAGE: PyOutput[] = [];
+const fileCache = new FileCache();
 
 type PyOutput = {
     filename: string,
@@ -25,6 +27,16 @@ export async function getCache(): Promise<PyOutput[]> {
 export async function processPDF(file: File): Promise<string> {
     // Get the original filename
     const fileName = file.name;
+
+    // Try to read from cache first
+    const cachedData = await fileCache.get<Omit<PyOutput, 'filename'>>(fileName);
+    if (cachedData) {
+        LOAD_AND_REDACT_STORAGE.push({
+            ...cachedData,
+            filename: fileName
+        });
+        return cachedData.original_text;
+    }
 
     const tempDir = tmpdir();
     const inputPath = join(tempDir, `input-${Date.now()}.pdf`);
@@ -45,10 +57,13 @@ export async function processPDF(file: File): Promise<string> {
         // Read the output file
         const pyOutput = await readFile(outputPath, 'utf-8');
         const parsedOutput = JSON.parse(pyOutput);
+
+        // Store in memory for BART and file cache for persistence
         LOAD_AND_REDACT_STORAGE.push({
             ...parsedOutput,
             filename: fileName
         });
+        await fileCache.set(fileName, parsedOutput);
 
         // Clean up temporary files
         await Promise.all([
