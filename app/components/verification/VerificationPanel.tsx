@@ -145,7 +145,17 @@ export default function VerificationPanel({
                   View Detection Evidence
                 </summary>
                 <div className="mt-2 p-3 bg-gray-800/60 rounded-lg text-sm text-gray-300 whitespace-pre-wrap">
-                  {issue.evidence || "No detailed evidence provided"}
+                <div className="mt-2 p-3 bg-gray-800/60 rounded-lg text-sm text-gray-300">
+                {issue.evidence ? (
+                  <ul className="list-disc pl-5 space-y-1">
+                    {issue.evidence.map((item, index) => (
+                      item.trim() && <li key={index}>{item.trim()}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  "No detailed evidence provided"
+                )}
+              </div>
                 </div>
               </details>
             </div>
