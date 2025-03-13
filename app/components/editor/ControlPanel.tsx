@@ -58,6 +58,7 @@ export default function ControlPanel() {
       selectedPiiTypes,
       freeTextInput
     );
+    console.log("Found detections:", foundDetections);
     setDetections(foundDetections);
     setIsProcessing(false);
   };
