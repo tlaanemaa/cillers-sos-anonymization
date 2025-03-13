@@ -70,7 +70,7 @@ export async function verify(issue_id: string, text: string, prompt: string): Pr
 
     console.log('AI found:', found);
 
-    evidence= found? evidence: [];
+    found = evidence.length <1? false: found;
     console.log('AI evidence:', evidence);
     //console.log('AI verification response:', responseText);
 
