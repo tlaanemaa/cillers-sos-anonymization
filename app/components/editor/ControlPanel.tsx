@@ -51,28 +51,6 @@ export default function ControlPanel() {
     }
 
     setIsProcessing(true);
-    const runScript = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/run-script?script=script", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-
-        const data = await response.json();
-        console.log("Output:", data.output);
-        console.error("Error:", data.error);
-      } catch (error) {
-        console.error("Fetch error:", error);
-      }
-    };
-
-// Call the function
-    runScript();
-
-
-    setIsProcessing(false);
 
     const foundDetections = await detect(
       originalText,
