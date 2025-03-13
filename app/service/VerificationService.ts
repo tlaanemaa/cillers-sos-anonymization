@@ -40,7 +40,7 @@ import { VerificationType } from "@/app/service/types";
           id: "religion",
           title: "Religion",
           prompt: "Analyze the following text and determine if it contains any religion information. Only respond with \"true\" if you detect religion related information, otherwise respond with \"false\".",
-          issueText: "Detected religion information in anonymized text"
+          issueText: "Detected religious information in anonymized text"
         },{
           id: "gender",
           title: "Gender",

@@ -31,7 +31,7 @@
     const updateVerification = (prev: { complete: boolean; issues: string[] }, type: VerificationType, hasIssue: boolean) => {
       // Remove any existing issues of this type
       const filteredIssues = prev.issues.filter(issue => 
-        !issue.includes(type.id) && !issue.includes(type.title)
+        !issue.includes(type.issueText) 
       );
       
       // Add the issue if it was found
