@@ -3,9 +3,11 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { PiiType, RedactionSchema } from "./schemas";
 import { promptTemplate } from "./prompts";
 
-const responseFormat = z.array(RedactionSchema, {
-    description: "The list of PII detected in the text",
-});
+const responseFormat = z.object({
+    redactions: z.array(RedactionSchema, {
+        description: "The list of PII detected in the text",
+    })
+})
 
 type PiiAgentResponse = z.infer<typeof responseFormat>;
 
@@ -13,9 +15,10 @@ export async function callPiiAgent(
     text: string,
     piiTypesToDetect: PiiType[] = [],
     freeTextInput: string = ""
-): Promise<PiiAgentResponse> {
+): Promise<PiiAgentResponse["redactions"]> {
     const model = new ChatGoogleGenerativeAI({
         model: "gemini-2.0-flash",
+        
     });
 
     const structuredLlm = model.withStructuredOutput(responseFormat);
@@ -28,5 +31,5 @@ export async function callPiiAgent(
     console.debug("Prompting LLM:", prompt.toString());
     const response = await structuredLlm.invoke(prompt);
     console.debug("LLM response:", response);
-    return response;
+    return response.redactions;
 }
