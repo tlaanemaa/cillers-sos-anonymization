@@ -39,7 +39,9 @@ export async function applyRedactions(
 
   for (const redaction of mergedRedactions) {
     redactedText += input.substring(lastIndex, redaction.start);
-    redactedText += redactionChar.repeat(redaction.end - redaction.start);
+    // Use replacement if available, otherwise use redactionChar
+    const replacement = redaction.replacement || redactionChar.repeat(redaction.end - redaction.start);
+    redactedText += replacement;
     lastIndex = redaction.end;
   }
 
