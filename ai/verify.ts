@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { VerificationResultType } from "@/app/service/types";
 
 // Initialize the Google Generative AI with your API key
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 export async function verify(issue_id: string, text: string, prompt: string): Promise<VerificationResultType> {
 
