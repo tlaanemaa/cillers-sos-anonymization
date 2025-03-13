@@ -250,25 +250,21 @@ export default function ControlPanel() {
             </div>
 
             {/* Advanced Options Panel */}
-            <div
-              className={`space-y-4 overflow-hidden transition-all duration-300 ease-in-out ${
-                showAdvancedOptions
-                  ? "max-h-[1000px] opacity-100 mb-4"
-                  : "max-h-0 opacity-0"
-              }`}
-            >
-              {/* PII Types Selection */}
-              <PiiTypeSelector
-                selectedTypes={selectedPiiTypes}
-                onChange={setSelectedPiiTypes}
-              />
+            {showAdvancedOptions && (
+              <div className="space-y-4 mb-4">
+                {/* PII Types Selection */}
+                <PiiTypeSelector
+                  selectedTypes={selectedPiiTypes}
+                  onChange={setSelectedPiiTypes}
+                />
 
-              {/* Free Text Input */}
-              <FreeTextInput
-                value={freeTextInput}
-                onChange={setFreeTextInput}
-              />
-            </div>
+                {/* Free Text Input */}
+                <FreeTextInput
+                  value={freeTextInput}
+                  onChange={setFreeTextInput}
+                />
+              </div>
+            )}
 
             {/* Action Buttons - Always visible */}
             <div className="space-y-3">
