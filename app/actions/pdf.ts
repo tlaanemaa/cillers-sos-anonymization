@@ -5,56 +5,85 @@ import { writeFile, readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
-export async function processPDF(file: File): Promise<string> {
-  try {
-    // Create a temporary file path
-    const tempDir = tmpdir();
-    const inputPath = join(tempDir, `input-${Date.now()}.pdf`);
-    const outputPath = join(tempDir, `output-${Date.now()}.txt`);
+/**
+ * Runs a command and returns its output as a promise
+ * @param command The command to run
+ * @param args Array of command arguments
+ * @param timeoutMs Timeout in milliseconds (default: 180000ms = 3 minutes)
+ * @returns Promise that resolves with the command output
+ */
+async function runCommand(
+  command: string,
+  args: string[],
+  timeoutMs: number = 180000
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const process = spawn(command, args);
+    let errorOutput = '';
+    const timeoutId = setTimeout(() => {
+      process.kill(); // Kill the process if it exceeds the timeout
+      reject(new Error(`Command timed out after ${timeoutMs / 1000} seconds`));
+    }, timeoutMs);
 
+    process.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+    });
+
+    process.on('close', async (code) => {
+      clearTimeout(timeoutId); // Clear the timeout if the process completes
+      if (code !== 0) {
+        reject(new Error(`Command failed: ${errorOutput}`));
+        return;
+      }
+      resolve(errorOutput);
+    });
+
+    // Handle process errors
+    process.on('error', (error) => {
+      clearTimeout(timeoutId);
+      reject(new Error(`Failed to start command: ${error.message}`));
+    });
+  });
+}
+
+export async function processPDF(file: File): Promise<string> {
+  const tempDir = tmpdir();
+  const inputPath = join(tempDir, `input-${Date.now()}.pdf`);
+  const outputPath = join(tempDir, `output-${Date.now()}.txt`);
+
+  try {
     // Convert File to Buffer and write to temp file
     const buffer = Buffer.from(await file.arrayBuffer());
     await writeFile(inputPath, buffer);
 
-    // Call Python script to process PDF
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn('python', [
-        'cli/pdf_converter.py',
-        inputPath,
-        outputPath
-      ]);
+    // Run the PDF conversion command with a 3-minute timeout
+    await runCommand('python', [
+      'cli/pdf_converter.py',
+      inputPath,
+      outputPath
+    ]);
 
-      let errorOutput = '';
+    // Read the output file
+    const outputText = await readFile(outputPath, 'utf-8');
 
-      pythonProcess.stderr.on('data', (data) => {
-        errorOutput += data.toString();
-      });
+    // Clean up temporary files
+    await Promise.all([
+      unlink(inputPath),
+      unlink(outputPath)
+    ]);
 
-      pythonProcess.on('close', async (code) => {
-        if (code !== 0) {
-          reject(new Error(`PDF processing failed: ${errorOutput}`));
-          return;
-        }
-
-        try {
-          // Read the output file
-          const outputText = await readFile(outputPath, 'utf-8');
-          
-          // Clean up temporary files
-          await Promise.all([
-            unlink(inputPath),
-            unlink(outputPath)
-          ]);
-
-          resolve(outputText);
-        } catch (error) {
-          console.error('Error reading output file:', error);
-          reject(new Error('Failed to read processed text'));
-        }
-      });
-    });
+    return outputText;
   } catch (error) {
     console.error('Error processing PDF:', error);
-    throw new Error('Internal server error');
+    // Clean up temporary files even if there's an error
+    try {
+      await Promise.all([
+        unlink(inputPath).catch(() => { }),
+        unlink(outputPath).catch(() => { })
+      ]);
+    } catch (cleanupError) {
+      console.error('Error cleaning up temporary files:', cleanupError);
+    }
+    throw new Error('Failed to process PDF file');
   }
 } 
