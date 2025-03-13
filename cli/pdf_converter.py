@@ -2,6 +2,7 @@
 import sys
 import os
 from typing import Optional
+from censurering import main2
 
 def convert_pdf_to_text(input_path: str, output_path: str) -> Optional[str]:
     """
@@ -49,5 +50,11 @@ def main():
         
     print(f"Successfully converted PDF to text: {output_path}")
 
+
 if __name__ == "__main__":
-    main() 
+# Specify the PDF path and output directory
+    output_dir = "output_bart"
+
+
+# Call the main2 function with the output directory
+    main2(sys.argv[1], sys.argv[2])
