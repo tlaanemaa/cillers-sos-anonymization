@@ -14,7 +14,7 @@ export async function detectPII(
   const bounded_risk_tolerance = Math.min(Math.max(risk_tolerance, 0), 1);
 
   // const redactions = await callPiiAgent(input, piiTypesToDetect, freeTextInput);
-  const redactions = await callPiiAgent(input);
+  const redactions = await callPiiAgent(input, piiTypesToDetect, freeTextInput);
 
   return redactions.filter(
     // Low risk tolerance (0) → "Conservative" → detects more potential PII (low confidence threshold)
