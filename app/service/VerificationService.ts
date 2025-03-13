@@ -1,22 +1,26 @@
   // service/VerificationService.ts
 import { verify } from "@/ai/verify"; // Direct import from the ai folder
-import { VerificationType } from "@/app/service/types";  
+import { VerificationResultType, VerificationIssueType } from "@/app/service/types";  
 
   export default class VerificationService {
-    static async checkTextWithAI(text: string, prompt: string): Promise<boolean> {
+    static async checkTextWithAI(issue_id: string, text: string, prompt: string): Promise<VerificationResultType> {
       try {
         console.log(`Running verification with prompt: ${prompt.substring(0, 30)}...`);
         // Direct function call instead of API fetch
-        const final_response = await verify(text, prompt);
+        const final_response = await verify(issue_id,text, prompt);
         console.log(`Verification result: ${final_response}`);
         return final_response;
       } catch (error) {
         console.error('Error checking with AI:', error);
-        return false;
+        return {
+          issue_id: issue_id,
+          found: false,
+          evidence: []
+        };
       }
     }
     
-    static getVerificationTypes(): VerificationType[] {
+    static getVerificationTypes(): VerificationIssueType[] {
       return [
         {
           id: "age",
