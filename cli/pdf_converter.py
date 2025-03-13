@@ -2,7 +2,7 @@
 import sys
 import os
 from typing import Optional
-from censurering import main2
+from censurering import main2, generate_redactions_from_tagged
 
 def convert_pdf_to_text(input_path: str, output_path: str) -> Optional[str]:
     """
@@ -57,4 +57,5 @@ if __name__ == "__main__":
 
 
 # Call the main2 function with the output directory
-    main2(sys.argv[1], sys.argv[2])
+    json = main2(sys.argv[1], sys.argv[2])
+    print("The json keys are: ", json.keys())

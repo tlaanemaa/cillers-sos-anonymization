@@ -4,6 +4,7 @@ import os
 import sys
 import warnings
 import re
+import uuid
 
 # 1. Tvinga docling att använda CPU
 os.environ['FORCE_CPU'] = "1"
@@ -134,6 +135,218 @@ def censurering_text(text, ner_pipeline, confidence_threshold=0.5, callback=None
         print(f"Censurerat: '{word}' ({entity['entity_group']}) - confidence: {entity['score']:.2f}")
     
     return censored_text
+
+def extract_entities_from_tagged_text(tagged_text):
+    """
+    Extrahera entiteter och positioner från den taggade texten där formatet är
+    <ord> (score) - vilket säkerställer att vi använder exakt samma positioner
+    som i taggningen.
+
+    Args:
+        tagged_text: Den taggade texten med markerade ord
+
+    Returns:
+        Lista med entiteter med positioner och ord
+    """
+    entities = []
+
+    # Hitta alla förekomster av taggade ord med regex
+    # Format: <ord> (score)
+    tagged_pattern = r'<([^>]+)> \(([0-9.]+)\)'
+
+    # Försök också matcha en eventuell entitetstyp i taggen - för framtida kompabilitet
+    # Format: <ord> (PER) (score) eller liknande
+    tagged_pattern_with_type = r'<([^>]+)> \(([A-Z\-_]+)\) \(([0-9.]+)\)'
+
+    # Spara originaltexten utan taggningar
+    original_text = re.sub(tagged_pattern, r'\1', tagged_text)
+
+    # Position offset för att hantera skillnader i längd mellan original och taggad text
+    offset = 0
+
+    # Försök först hitta taggformat med entitetstyp
+    has_entity_types = len(re.findall(tagged_pattern_with_type, tagged_text)) > 0
+
+    if has_entity_types:
+        # Använd det utökade mönstret som inkluderar entitetstyp
+        for match in re.finditer(tagged_pattern_with_type, tagged_text):
+            full_match = match.group(0)  # <ord> (entity_type) (score)
+            word = match.group(1)        # ordet
+            entity_type = match.group(2)  # entitetstypen
+            score = float(match.group(3))  # confidence score
+
+            # Originalpositionen i den taggade texten
+            start_pos_tagged = match.start()
+            end_pos_tagged = match.end()
+
+            # Justera positioner för att hitta ordet i originaltexten
+            start_pos_original = start_pos_tagged - offset
+            end_pos_original = start_pos_original + len(word)
+
+            # Uppdatera offset för nästa matchning
+            offset += len(full_match) - len(word)
+
+            # Lägg till entiteten
+            entities.append({
+                'word': word,
+                'score': score,
+                'start': start_pos_original,
+                'end': end_pos_original,
+                'entity_type': entity_type
+            })
+    else:
+        # Använd standardmönstret om det inte finns entitetstyp
+        for match in re.finditer(tagged_pattern, tagged_text):
+            full_match = match.group(0)  # <ord> (score)
+            word = match.group(1)        # ordet
+            score = float(match.group(2))  # confidence score
+
+            # Originalpositionen i den taggade texten
+            start_pos_tagged = match.start()
+            end_pos_tagged = match.end()
+
+            # Justera positioner för att hitta ordet i originaltexten
+            start_pos_original = start_pos_tagged - offset
+            end_pos_original = start_pos_original + len(word)
+
+            # Uppdatera offset för nästa matchning
+            offset += len(full_match) - len(word)
+
+            # Bestäm entitetstyp baserat på innehåll
+            entity_type = "PER"  # Default till PER som kommer mapppas till "name"
+
+            # Försök identifiera typ baserat på innehåll
+            if re.match(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b', word):
+                entity_type = "PERSONUPPGIFT"  # E-post
+            elif re.match(r'\b(?:\+46|0)(?:[\s-])?[0-9]{1,3}(?:[\s-])?[0-9]{2,3}(?:[\s-])?[0-9]{2,3}(?:[\s-])?[0-9]{2,3}\b', word):
+                entity_type = "PERSONUPPGIFT"  # Telefonnummer
+            elif re.match(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', word):
+                entity_type = "PERSONUPPGIFT"  # IP-adress (IPv4)
+            elif re.match(r'\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b', word):
+                entity_type = "PERSONUPPGIFT"  # IP-adress (IPv6)
+            elif re.match(r'\b(?:\d{4}[- ]?){3}\d{4}\b', word):
+                entity_type = "PERSONUPPGIFT"  # Kreditkort
+            elif re.match(r'\b(?:\d{6,8})[-]?\d{4}\b', word):
+                entity_type = "PERSONUPPGIFT"  # Personnummer
+            elif any(word.lower().find(place) >= 0 for place in ['väg', 'gata', 'gatan', 'avenue', 'street', 'malmö', 'stockholm', 'göteborg']):
+                entity_type = "LOC"  # Adress om det verkar innehålla platsord
+
+            # Lägg till entiteten
+            entities.append({
+                'word': word,
+                'score': score,
+                'start': start_pos_original,
+                'end': end_pos_original,
+                'entity_type': entity_type
+            })
+
+    return entities, original_text
+def map_entity_type_to_pii_type(entity_type):
+    """Mappa NER entitetstyper till PII_TYPES som definieras i schemas.ts"""
+    mapping = {
+        "PER": "name",       # Personer -> namn
+        "LOC": "address",    # Platser -> adress
+        "ORG": "other",      # Organisationer -> annan
+        "MISC": "other",     # Diverse -> annan
+        "PERSONUPPGIFT": "other",  # Default för personuppgifter, ändras senare baserat på mönster
+        "B-PER": "name",     # För modeller som använder BIO-taggning
+        "I-PER": "name",     # För modeller som använder BIO-taggning
+        "B-LOC": "address",  # För modeller som använder BIO-taggning
+        "I-LOC": "address",  # För modeller som använder BIO-taggning
+        "B-ORG": "other",    # För modeller som använder BIO-taggning
+        "I-ORG": "other",    # För modeller som använder BIO-taggning
+        "B-MISC": "other",   # För modeller som använder BIO-taggning
+        "I-MISC": "other"    # För modeller som använder BIO-taggning
+    }
+    return mapping.get(entity_type, "other")
+
+# Extra regex-mönster för att identifiera specifika PII-typer
+def identify_pii_subtype(text, entity_type):
+    """Identifiera mer specifika PII-typer baserat på textmönster"""
+    # Använd först mappningen från NER entitetstyp till PII_TYPE
+    base_type = map_entity_type_to_pii_type(entity_type)
+
+    # Om det redan är en mappning för PER eller LOC, använd den
+    if base_type in ["name", "address"]:
+        return base_type
+
+    # E-postadresser
+    if re.match(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b', text):
+        return "email"
+
+    # Telefonnummer (olika format)
+    if re.match(r'\b(?:\+46|0)(?:[\s-])?[0-9]{1,3}(?:[\s-])?[0-9]{2,3}(?:[\s-])?[0-9]{2,3}(?:[\s-])?[0-9]{2,3}\b', text):
+        return "phone"
+
+    # IP-adresser (IPv4)
+    if re.match(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', text):
+        return "ip"
+
+    # IP-adresser (IPv6)
+    if re.match(r'\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b', text):
+        return "ip"
+
+    # Kreditkort
+    if re.match(r'\b(?:\d{4}[- ]?){3}\d{4}\b', text):
+        return "credit-card"
+
+    # Personnummer (hanteras som "other" för att passa PII_TYPES)
+    if re.match(r'\b(?:\d{6,8})[-]?\d{4}\b', text):
+        return "other"  # Personnummer kategoriseras som "other"
+
+    # Personnamn - om texten innehåller vanliga namndelar
+    common_names = ["johan", "andersson", "erik", "larsson", "svensson", "marie", "anna", "nils", "olsson", "karlsson"]
+    if any(name in text.lower() for name in common_names):
+        return "name"
+
+    # Adressindikationer
+    address_indicators = ["vägen", "gatan", "avenue", "street", "malmö", "stockholm", "göteborg", "köpenhamn", "oslo"]
+    if any(indicator in text.lower() for indicator in address_indicators):
+        return "address"
+
+    # Om vi inte kan identifiera en specifik undertyp, använd den mappade entitetstypen
+    return base_type
+
+def generate_redactions_from_tagged(tagged_text):
+    """
+    Generera redaktioner från taggad text genom att extrahera entiteter och bestämma typ.
+    Detta säkerställer att vi använder exakt samma positioner som i taggningen.
+
+    Args:
+        tagged_text: Den taggade texten med markerade ord
+
+    Returns:
+        Lista med redaktioner som följer schemas.ts
+    """
+    entities, original_text = extract_entities_from_tagged_text(tagged_text)
+    redactions = []
+
+    # För varje identifierad entitet
+    for entity in entities:
+        word = entity['word']
+        score = entity['score']
+        start = entity['start']
+        end = entity['end']
+        entity_type = entity['entity_type']
+
+        # Identifiera PII-typ baserat på entitetstyp och innehåll i ordet
+        pii_type = identify_pii_subtype(word, entity_type)
+
+        # Skapa ett Redaction-objekt som matchar schemas.ts
+        redaction = {
+            "id": str(uuid.uuid4()),  # Generera ett unikt ID
+            "type": pii_type,
+            "confidence": score,
+            "start": start,
+            "end": end,
+            "replacement": "*" * len(word),  # Ersättning med asterisker
+            "text": word  # Det ursprungliga ordet som censureras
+        }
+
+        redactions.append(redaction)
+
+    return redactions, original_text
+
 
 def censor_personal_data(text):
     """
@@ -291,6 +504,11 @@ def main2(pdf_path, output_file):
         base_name = pdf_path.stem
 
 
+        # Spara den censurerade texten
+        censored_path = f"resultat_{base_name}_censurerad.txt"
+        with open(censored_path, "w", encoding="utf-8") as f:
+            f.write(censored_text)
+
         # Spara originaltexten
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(plain_text)
@@ -314,22 +532,3 @@ def main2(pdf_path, output_file):
         import traceback
         traceback.print_exc()
         return None
-
-if __name__ == "__main__":
-    import sys
-    import argparse
-    
-    # Skapa en argument parser för kommandoradsargument
-    parser = argparse.ArgumentParser(description='Konvertera PDF till text och censurerar personuppgifter.')
-    parser.add_argument('file', nargs='?', help='PDF-fil att bearbeta')
-    
-    args = parser.parse_args()
-    
-    if args.file:
-        print(f"Bearbetar fil: {args.file}")
-        main(args.file)
-    else:
-        print("Använder standardfil: 2.pdf")
-        main()
-    
-    print("\nCensureringsprocessen är klar!") 
