@@ -2,7 +2,7 @@
   import { useState } from "react";
   import VerificationButton from "./VerificationButton";
   import VerificationService from "../../service/VerificationService";
-  import { VerificationType } from "../../service/types";
+  import { VerificationIssueType } from "../../service/types";
   import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
   
   type VerificationPanelProps = {
@@ -28,7 +28,7 @@
     
     const verificationTypes = VerificationService.getVerificationTypes();
     
-    const updateVerification = (prev: { complete: boolean; issues: string[] }, type: VerificationType, hasIssue: boolean) => {
+    const updateVerification = (prev: { complete: boolean; issues: string[] }, type: VerificationIssueType, hasIssue: boolean) => {
       // Remove any existing issues of this type
       const filteredIssues = prev.issues.filter(issue => 
         !issue.includes(type.issueText) 
@@ -45,14 +45,17 @@
       };
     };
 
-    const runVerification = async (type: VerificationType) => {
+    const runVerification = async (type: VerificationIssueType) => {
       if (loading) return;
       
       setLoading(true);
       setActiveVerification(type.id);
       console.log(`Running ${type.title} verification...`);
       try {
-        const hasIssue = await VerificationService.checkTextWithAI(anonymizedText, type.prompt);
+        const verificationResponse = await VerificationService.checkTextWithAI(type.id,anonymizedText, type.prompt);
+
+        const hasIssue=verificationResponse.found;
+
         
         // Update verification issues
         setVerification(prev => updateVerification(prev, type, hasIssue));
