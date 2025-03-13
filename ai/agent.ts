@@ -16,7 +16,7 @@ export async function callPiiAgent(
 ): Promise<PiiAgentResponse> {
   const model = new ChatOllama({
     baseUrl: "http://localhost:11434",
-    model: "llama3.1",
+    model: "gemma3:1b",
   });
 
   const structuredLlm = model.withStructuredOutput(responseFormat);

@@ -1,60 +1,48 @@
 "use server";
 
-import { spawn } from 'child_process';
 import { writeFile, readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { runCommand } from '../utils/process';
 
 export async function processPDF(file: File): Promise<string> {
-  try {
-    // Create a temporary file path
-    const tempDir = tmpdir();
-    const inputPath = join(tempDir, `input-${Date.now()}.pdf`);
-    const outputPath = join(tempDir, `output-${Date.now()}.txt`);
+  const tempDir = tmpdir();
+  const inputPath = join(tempDir, `input-${Date.now()}.pdf`);
+  const outputPath = join(tempDir, `output-${Date.now()}.txt`);
 
+  try {
     // Convert File to Buffer and write to temp file
     const buffer = Buffer.from(await file.arrayBuffer());
     await writeFile(inputPath, buffer);
 
-    // Call Python script to process PDF
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn('python', [
-        'cli/pdf_converter.py',
-        inputPath,
-        outputPath
-      ]);
+    // Run the PDF conversion command with a 3-minute timeout
+    await runCommand('python', [
+      'cli/pdf_converter.py',
+      inputPath,
+      outputPath
+    ]);
 
-      let errorOutput = '';
+    // Read the output file
+    const outputText = await readFile(outputPath, 'utf-8');
 
-      pythonProcess.stderr.on('data', (data) => {
-        errorOutput += data.toString();
-      });
+    // Clean up temporary files
+    await Promise.all([
+      unlink(inputPath),
+      unlink(outputPath)
+    ]);
 
-      pythonProcess.on('close', async (code) => {
-        if (code !== 0) {
-          reject(new Error(`PDF processing failed: ${errorOutput}`));
-          return;
-        }
-
-        try {
-          // Read the output file
-          const outputText = await readFile(outputPath, 'utf-8');
-          
-          // Clean up temporary files
-          await Promise.all([
-            unlink(inputPath),
-            unlink(outputPath)
-          ]);
-
-          resolve(outputText);
-        } catch (error) {
-          console.error('Error reading output file:', error);
-          reject(new Error('Failed to read processed text'));
-        }
-      });
-    });
+    return outputText;
   } catch (error) {
     console.error('Error processing PDF:', error);
-    throw new Error('Internal server error');
+    // Clean up temporary files even if there's an error
+    try {
+      await Promise.all([
+        unlink(inputPath).catch(() => { }),
+        unlink(outputPath).catch(() => { })
+      ]);
+    } catch (cleanupError) {
+      console.error('Error cleaning up temporary files:', cleanupError);
+    }
+    throw new Error('Failed to process PDF file');
   }
 } 

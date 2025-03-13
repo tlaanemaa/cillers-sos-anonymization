@@ -1,17 +1,15 @@
-import { useDocumentStore } from '@/app/store/documentStore';
-import { Redaction } from '@/ai/schemas';
-import TextHighlighter from './TextHighlighter';
-import { DocumentTextIcon, ShieldCheckIcon, InformationCircleIcon, ArrowPathIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { useDocumentStore } from "@/app/store/documentStore";
+import {
+  DocumentTextIcon,
+  ShieldCheckIcon,
+  InformationCircleIcon,
+  ArrowPathIcon,
+  LightBulbIcon,
+} from "@heroicons/react/24/outline";
 
 export default function DocumentDisplay() {
-  const { 
-    originalText, 
-    anonymizedText, 
-    detections, 
-    addDetection,
-    removeDetection,
-    reset
-  } = useDocumentStore();
+  const { originalText, anonymizedText, detections, reset } =
+    useDocumentStore();
 
   // Calculate isAnonymized from anonymizedText
   const isAnonymized = !!anonymizedText;
@@ -34,7 +32,7 @@ export default function DocumentDisplay() {
             </>
           )}
         </h2>
-        
+
         <div className="flex items-center gap-3 text-sm">
           {detections.length > 0 && (
             <span className="bg-sky-900/30 text-sky-300 px-3 py-1 rounded-full border border-sky-800/30 flex items-center">
@@ -42,8 +40,8 @@ export default function DocumentDisplay() {
               {detections.length} items detected
             </span>
           )}
-          
-          <button 
+
+          <button
             onClick={reset}
             className="text-slate-400 hover:text-slate-200 flex items-center group"
           >
@@ -52,46 +50,22 @@ export default function DocumentDisplay() {
           </button>
         </div>
       </div>
-      
+
       <div className="bg-gray-900/80 rounded-xl overflow-hidden border border-gray-700/30">
-        {isAnonymized ? (
-          <div className="whitespace-pre-wrap font-mono text-sm p-4 min-h-[300px] max-h-[600px] overflow-auto text-slate-200">
-            {anonymizedText}
-          </div>
-        ) : (
-          <TextHighlighter
-            text={originalText}
-            detections={detections}
-            isAnonymized={isAnonymized}
-            onAddHighlight={(start, end) => {
-              console.log('Adding custom highlight:', { start, end });
-              const newDetection: Redaction = {
-                id: `manual-${Date.now()}`,
-                type: "MANUAL_PII",
-                start,
-                end,
-                confidence: 1.0,
-                text: originalText.substring(start, end)
-              };
-              addDetection(newDetection);
-            }}
-            onRemoveHighlight={(id) => {
-              console.log('Removing highlight:', id);
-              removeDetection(id);
-            }}
-          />
-        )}
+        <div className="whitespace-pre-wrap font-mono text-sm p-4 min-h-[300px] max-h-[600px] overflow-auto text-slate-200">
+          {isAnonymized ? anonymizedText : originalText}
+        </div>
       </div>
-      
+
       {!isAnonymized && (
         <div className="mt-4 flex items-center text-sm text-slate-400">
           <LightBulbIcon className="w-4 h-4 mr-2 text-pink-400" />
           <p>
-            <span className="font-medium">Tip:</span> Select any text to add a custom highlight, or click the × 
-            on existing highlights to remove them.
+            <span className="font-medium">Tip:</span> Use the &ldquo;Add
+            Selected PII&rdquo; button in the control panel to mark text as PII.
           </p>
         </div>
       )}
     </section>
   );
-} 
+}

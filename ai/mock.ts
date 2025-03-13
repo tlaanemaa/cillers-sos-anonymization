@@ -59,6 +59,7 @@ export function mockDetectPII(text: string): Redaction[] {
         confidence: Math.random() * 0.5 + 0.5,
         start: match.index,
         end: match.index + match[0].length,
+        replacement: "█".repeat(match[0].length)
       });
     }
   });

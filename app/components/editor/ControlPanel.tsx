@@ -28,6 +28,7 @@ export default function ControlPanel() {
     anonymizedText,
     riskTolerance,
     setDetections,
+    addDetection,
     setAnonymizedText,
     setRiskTolerance,
   } = useDocumentStore();
@@ -79,6 +80,7 @@ export default function ControlPanel() {
       selectedPiiTypes,
       freeTextInput
     );
+    console.log("Found detections:", foundDetections);
     setDetections(foundDetections);
     setIsProcessing(false);
   };
@@ -99,28 +101,28 @@ export default function ControlPanel() {
 
   const handleVerifyClick = () => {
     if (!anonymizedText) {
-      alert('Please anonymize the document first before verifying');
+      alert("Please anonymize the document first before verifying");
       return;
     }
-    
+
     // Create a base URL that works in different environments
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
     const modifiedContentUrl = `${baseUrl}/verification`;
-    
+
     // Store the anonymized text in sessionStorage so the verification page can access it
-    sessionStorage.setItem('anonymizedText', anonymizedText);
-    sessionStorage.setItem('originalText', originalText); 
-    
+    sessionStorage.setItem("anonymizedText", anonymizedText);
+    sessionStorage.setItem("originalText", originalText);
+
     // Open the new tab
-    const newTab = window.open(modifiedContentUrl, '_blank');
-  
+    const newTab = window.open(modifiedContentUrl, "_blank");
+
     // Check if the new tab was successfully opened
-    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-      alert('Failed to open the verification page. Please check your popup blocker settings.');
+    if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
+      alert(
+        "Failed to open the verification page. Please check your popup blocker settings."
+      );
     }
   };
-
-
 
   const handleDownload = () => {
     if (!anonymizedText) return;
@@ -136,10 +138,6 @@ export default function ControlPanel() {
     URL.revokeObjectURL(url);
   };
 
-  
-
-
-
   // Add a manual PII section
   const handleAddPIISection = () => {
     // Get the current selection from the document
@@ -149,33 +147,24 @@ export default function ControlPanel() {
       return;
     }
 
-    const range = selection.getRangeAt(0);
-    const selectionContainer = range.commonAncestorContainer;
-
-    // Find the document container element
-    const documentContainer = document.querySelector(".whitespace-pre-wrap");
-    if (!documentContainer || !documentContainer.contains(selectionContainer)) {
-      alert("Please select text within the document");
-      return;
-    }
-
-    // Get the text content
     const selectedText = selection.toString();
     if (!selectedText || selectedText.length === 0) {
       alert("Please select text to mark as PII");
       return;
     }
 
-    // Find the absolute position in the original text
-    const firstChild = documentContainer.firstChild;
-    if (!firstChild) {
-      alert("Cannot determine text position");
+    // Find the document container element
+    // TODO: This is a hack to get the document container element
+    const documentContainer = document.querySelector(".whitespace-pre-wrap");
+    if (!documentContainer) {
+      alert("Please select text within the document");
       return;
     }
 
-    // This is a simplified approach, might need adjustments based on your exact setup
+    // Find the absolute position in the original text
+    const range = selection.getRangeAt(0);
     const textBeforeSelection = document.createRange();
-    textBeforeSelection.setStart(firstChild, 0);
+    textBeforeSelection.setStart(documentContainer.firstChild!, 0);
     textBeforeSelection.setEnd(range.startContainer, range.startOffset);
     const startPos = textBeforeSelection.toString().length;
 
@@ -187,9 +176,10 @@ export default function ControlPanel() {
       end: startPos + selectedText.length,
       confidence: 1.0,
       text: selectedText,
+      replacement: "█".repeat(selectedText.length),
     };
 
-    setDetections([...detections, newDetection]);
+    addDetection(newDetection);
   };
 
   // If no document is loaded, show a message
@@ -282,10 +272,10 @@ export default function ControlPanel() {
             </div>
 
             {/* Advanced Options Panel */}
-            <div 
+            <div
               className={`space-y-4 overflow-hidden transition-all duration-300 ease-in-out ${
-                showAdvancedOptions 
-                  ? "max-h-[1000px] opacity-100 mb-4" 
+                showAdvancedOptions
+                  ? "max-h-[1000px] opacity-100 mb-4"
                   : "max-h-0 opacity-0"
               }`}
             >
@@ -296,7 +286,10 @@ export default function ControlPanel() {
               />
 
               {/* Free Text Input */}
-              <FreeTextInput value={freeTextInput} onChange={setFreeTextInput} />
+              <FreeTextInput
+                value={freeTextInput}
+                onChange={setFreeTextInput}
+              />
             </div>
 
             {/* Action Buttons - Always visible */}
@@ -320,7 +313,6 @@ export default function ControlPanel() {
                   </>
                 )}
               </Button>
-
 
               <Button
                 onClick={handleAddPIISection}
@@ -369,7 +361,6 @@ export default function ControlPanel() {
             Verify Anonymized Document
           </Button>
         )}
-
 
         <div className="text-gray-400 text-xs text-center pt-4 border-t border-gray-700/30 mt-2">
           <div className="mb-1 text-gray-500">Document Editor v1.0</div>
