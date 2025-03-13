@@ -3,7 +3,7 @@
 import { PiiType, Redaction } from "./schemas";
 // import { callPiiAgent } from "./agent";
 //import { mockDetectPII } from "./mock";
-import { callPiiAgent } from "./bartAgent";
+import { callPiiAgent } from "./geminiAgent";
 
 export async function detectPII(
   input: string,
