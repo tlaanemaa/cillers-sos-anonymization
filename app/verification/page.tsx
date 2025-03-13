@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/app/components/shared/Button";
 import { useDocumentStore } from "@/app/store/documentStore";
-import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon, ArrowsRightLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon, ArrowsRightLeftIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import VerificationPanel from "@/app/components/verification/VerificationPanel";
+import { VerificationIssueType } from "@/app/service/types";
 
 export default function VerifyPage() {
   const { originalText } = useDocumentStore();
   const [anonymizedText, setAnonymizedText] = useState<string>("");
-  const [verification, setVerification] = useState<{ complete: boolean; issues: string[] }>({
+  const [verification, setVerification] = useState<{ complete: boolean; issues: VerificationIssueType[] }>({
     complete: false,
     issues: [],
   });
@@ -47,10 +48,11 @@ export default function VerifyPage() {
 
   // Highlight differences between original and anonymized text
   const highlightDifferences = () => {
-    if (!originalText || !anonymizedText) return anonymizedText;
+    const originalContent = sessionStorage.getItem("originalText") || originalText;
+    if (!originalContent || !anonymizedText) return anonymizedText;
     
     // This is a simple difference highlighter
-    const words1 = originalText.split(/\s+/);
+    const words1 = originalContent.split(/\s+/);
     const words2 = anonymizedText.split(/\s+/);
     
     const result = words2.map((word, index) => {
@@ -139,15 +141,15 @@ export default function VerifyPage() {
         <hr className="my-6 border border-gray-700" />
 
         {/* Verification status */}
-        <div className={`p-4 mb-6 rounded-lg ${verification.complete ? 'bg-yellow-900/20 border border-yellow-700' : 'bg-red-900/20 border border-red-700'}`}>
+        <div className={`p-4 mb-6 rounded-lg ${verification.complete ? 'bg-green-900/20 border border-green-700' : 'bg-yellow-900/20 border border-yellow-700'}`}>
           <div className="flex items-center">
             {verification.complete ? (
-              <CheckCircleIcon className="w-6 h-6 text-yellow-400 mr-2" />
+              <CheckCircleIcon className="w-6 h-6 text-green-400 mr-2" />
             ) : (
-              <XCircleIcon className="w-6 h-6 text-red-400 mr-2" />
+              <InformationCircleIcon className="w-6 h-6 text-yellow-400 mr-2" />
             )}
-            <span className={verification.complete ? 'text-yellow-400' : 'text-red-400'}>
-              {verification.complete ? 'No issues detected. Still review carefully before usage' : 'Results of verification categories:'}
+            <span className={verification.complete ? 'text-green-400' : 'text-yellow-400'}>
+              {verification.complete ? 'No issues detected. Still review carefully before usage' : 'Found issues with the anonymized document:'}
             </span>
           </div>
           
@@ -156,9 +158,12 @@ export default function VerifyPage() {
               <p className="text-sm text-gray-300 mb-2">Found {verification.issues.length} potential issues:</p>
               <ul className="list-disc pl-5 text-sm text-yellow-300">
                 {verification.issues.map((issue, index) => (
-                  <li key={index}>{issue}</li>
+                  <li key={index}>{issue.issueText}</li>
                 ))}
               </ul>
+              <p className="text-sm text-gray-400 mt-2">
+                Check the details above to see the specific evidence for each issue.
+              </p>
             </div>
           )}
         </div>
