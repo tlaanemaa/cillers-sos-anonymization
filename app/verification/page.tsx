@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/app/components/shared/Button";
 import { useDocumentStore } from "@/app/store/documentStore";
-import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon, ArrowsRightLeftIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CheckCircleIcon, ArrowsRightLeftIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import VerificationPanel from "@/app/components/verification/VerificationPanel";
 import { VerificationIssueType } from "@/app/service/types";
 
