@@ -6,7 +6,7 @@ import { tmpdir } from 'os';
 import { runCommand } from '../utils/process';
 import { Redaction } from '@/ai';
 
-export const LOAD_AND_REDACT_STORAGE: PyOutput[] = [];
+const LOAD_AND_REDACT_STORAGE: PyOutput[] = [];
 
 type PyOutput = {
     filename: string,
@@ -16,6 +16,10 @@ type PyOutput = {
     censored_markdown: string,
     tagged_text: string,
     redactions: Redaction[]
+}
+
+export async function getCache(): Promise<PyOutput[]> {
+    return LOAD_AND_REDACT_STORAGE;
 }
 
 export async function processPDF(file: File): Promise<string> {
