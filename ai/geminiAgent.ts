@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { PiiType, Redaction } from "./schemas";
+import { PII_TYPES, PiiType, Redaction } from "./schemas";
 import { promptTemplate } from "./prompts";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,6 +9,8 @@ const simpleResponseFormat = z.object({
     wordsToRedact: z.array(
         z.object({
             text: z.string().describe("The exact text that should be redacted"),
+            confidence: z.number().describe("The confidence score of the redaction").min(0).max(1),
+            type: z.enum(PII_TYPES).describe("The type of the redaction")
         }),
         {
             description: "The list of text items that should be redacted from the content"
@@ -81,7 +83,7 @@ function convertToRedactionSchema(
 
         // Create redaction entries for each match
         for (const match of matches) {
-            redactions.push(createRedactionObject(match));
+            redactions.push(createRedactionObject(match, item));
         }
     }
 
@@ -110,14 +112,14 @@ function findAllOccurrences(sourceText: string, textToFind: string): RedactionMa
 /**
  * Create a redaction object for a matched item
  */
-function createRedactionObject(match: RedactionMatch): Redaction {
+function createRedactionObject(match: RedactionMatch, item: SimpleResponse["wordsToRedact"][number]): Redaction {
     return {
         text: match.text,
         start: match.index,
         end: match.index + match.length,
-        type: "other",
+        type: item.type || "other",
         id: uuidv4(),
-        confidence: 1,
+        confidence: item.confidence,
         replacement: generateReplacement(match.length)
     };
 }
