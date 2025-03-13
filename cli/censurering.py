@@ -191,7 +191,7 @@ def censor_personal_data(text):
     
     return censored_text, censored_items
 
-def main2(pdf_path, output_dir="."):
+def main2(pdf_path, output_file):
     # 1. Konvertera PDF till text
     print("\n=== STEG 1: PDF-KONVERTERING ===")
 
@@ -290,28 +290,10 @@ def main2(pdf_path, output_dir="."):
         # Basera utfilnamn på infilnamnet
         base_name = pdf_path.stem
 
-        # Ensure the output directory exists
-        os.makedirs(output_dir, exist_ok=True)
 
         # Spara originaltexten
-        original_path = os.path.join(output_dir, f"resultat_{base_name}_original.txt")
-        with open(original_path, "w", encoding="utf-8") as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(plain_text)
-
-        # Spara den censurerade texten
-        censored_path = os.path.join(output_dir, f"resultat_{base_name}_censurerad.txt")
-        with open(censored_path, "w", encoding="utf-8") as f:
-            f.write(censored_text)
-
-        # Spara original markdown
-        original_md_path = os.path.join(output_dir, f"resultat_{base_name}_original.md")
-        with open(original_md_path, "w", encoding="utf-8") as f:
-            f.write(markdown_text)
-
-        # Spara censurerad markdown
-        censored_md_path = os.path.join(output_dir, f"resultat_{base_name}_censurerad.md")
-        with open(censored_md_path, "w", encoding="utf-8") as f:
-            f.write(markdown_censored)
 
         # 5. Visa exempelutdrag
         print("\nExempel på censurerad text:")
@@ -319,15 +301,12 @@ def main2(pdf_path, output_dir="."):
         print(censored_text[:500] + "..." if len(censored_text) > 500 else censored_text)
         print("-" * 50)
         print(f"\nResultat sparade till:")
-        print(f"- Text: '{original_path}' och '{censored_path}'")
-        print(f"- Markdown: '{original_md_path}' och '{censored_md_path}'")
 
         return {
             "original_text": plain_text,
             "censored_text": censored_text,
             "original_markdown": markdown_text,
             "censored_markdown": markdown_censored,
-            "files": [original_path, censored_path, original_md_path, censored_md_path]
         }
 
     except Exception as e:

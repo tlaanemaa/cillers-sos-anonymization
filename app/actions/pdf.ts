@@ -25,6 +25,8 @@ export async function processPDF(file: File): Promise<string> {
     // Read the output file
     const outputText = await readFile(outputPath, 'utf-8');
 
+    console.log('Processed PDF:', outputText);
+
     // Clean up temporary files
     await Promise.all([
       unlink(inputPath),

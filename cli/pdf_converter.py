@@ -57,5 +57,4 @@ if __name__ == "__main__":
 
 
 # Call the main2 function with the output directory
-    main2(sys.argv[1], output_dir)
-    main() 
+    main2(sys.argv[1], sys.argv[2])
