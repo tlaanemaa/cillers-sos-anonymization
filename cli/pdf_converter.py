@@ -52,10 +52,12 @@ def main():
 
 
 if __name__ == "__main__":
-# Specify the PDF path and output directory
-    output_dir = "output_bart"
 
-
-# Call the main2 function with the output directory
     json = main2(sys.argv[1], sys.argv[2])
     print("The json keys are: ", json.keys())
+    #retrieve the 'redactions' values
+    redactions = json['redactions']
+
+
+
+
